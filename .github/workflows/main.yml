@@ -41,7 +41,7 @@ jobs:
       - name: Push to R2
         run: |
           cd R2
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/USERNAME/R2.git
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
           git add .
           git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
           git push
