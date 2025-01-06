@@ -38,11 +38,18 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
           git remote -v
 
-      - name: Push to R2 with PAT
+      - name: Initialize Git Repository
+        run: |
+          git init  # Ensure the repository is initialized
+          git remote add origin https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git  # Add remote if not already added
+
+      - name: Add and Commit Changes
         run: |
           git add .
           git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
-          git branch -M main
+
+      - name: Push to R2 with PAT
+        run: |
           git push https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
 
       - name: Push to R2 with GITHUB_TOKEN (alternative method)
