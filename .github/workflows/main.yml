@@ -24,8 +24,8 @@ jobs:
 
       - name: Sync Changes from R1 to R2
         run: |
-          # Sync files directly into the R2 repo without nesting
-          rsync -av --exclude='.git' --exclude='.github' $GITHUB_WORKSPACE/* R2/
+          # Sync files directly into the root of R2 (no R2/ subfolder)
+          rsync -av --exclude='.git' --exclude='.github' $GITHUB_WORKSPACE/* R2/.
           
           # Commit and push from inside the R2 repo
           cd R2
