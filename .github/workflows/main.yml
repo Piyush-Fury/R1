@@ -38,6 +38,11 @@ jobs:
           # Example: Update Docker image tags
           find . -type f -name 'Prod-*.yaml' -exec sed -i 's/image: .*:\(.*\)/image: myimage:\1/' {} \;
 
+      - name: Debug Token and Repository Access
+        run: |
+          echo "Token used: ${{ secrets.PAT }}"
+          git remote -v
+
       - name: Push to R2 with PAT
         run: |
           cd R2
@@ -45,8 +50,3 @@ jobs:
           git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
           git branch -M main
           git push https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
-          
-      - name: Debug Token and Repository Access
-        run: |
-          echo "Token used: ${{ secrets.PAT }}"
-          git remote -v
