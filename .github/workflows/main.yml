@@ -21,13 +21,14 @@ jobs:
       - name: Clone Repository R2
         run: |
           git clone https://github.com/Piyush-Fury/R2.git
+          cd R2
           git checkout main  # Ensure you're on the right branch (change if needed)
 
       - name: Sync Changes from R1 to R2
         run: |
           cd R2
-          # Copy the files from R1 to R2, but avoid copying the R2 directory itself
-          cp -r ../* .  # This copies all files except the repo2 directory
+          # Copy files from R1 to R2 using rsync and exclude .git directory
+          rsync -av --exclude='.git' ../* .  # This copies everything except .git
           git add .
           git commit -m "Sync changes from R1 to R2"
           git push origin main
