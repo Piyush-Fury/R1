@@ -1,4 +1,4 @@
-name: Sync R1 to R2
+name: Sync R1 to R2 with Prod Prefix
 
 on:
   push:
@@ -22,15 +22,25 @@ jobs:
         run: |
           git clone https://github.com/Piyush-Fury/R2.git
 
-      - name: Sync Changes from R1 to R2
+      - name: Rename Files with Prod Prefix and Sync to R2
         run: |
-          # Sync files directly into the root of R2 (no R2/ subfolder)
-          rsync -av --exclude='.git' --exclude='.github' $GITHUB_WORKSPACE/* R2/.
-          
+          # For each file in the source repo (R1), rename it with Prod- prefix and sync it to R2
+          for file in $GITHUB_WORKSPACE/*; do
+            if [ -f "$file" ]; then
+              # Get the filename without the path
+              filename=$(basename "$file")
+              # Prefix the filename with "Prod-"
+              mv "$file" "$GITHUB_WORKSPACE/Prod-$filename"
+            fi
+          done
+
+          # Sync the renamed files to R2, excluding .git and .github
+          rsync -av --exclude='.git' --exclude='.github' $GITHUB_WORKSPACE/ R2/
+
           # Commit and push from inside the R2 repo
           cd R2
           git add .
-          git commit -m "Sync changes from R1 to R2" || echo "No changes to commit"
+          git commit -m "Sync changes from R1 to R2 with Prod prefix" || echo "No changes to commit"
           
           # Use the GitHub token for authentication
           git push https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git main
