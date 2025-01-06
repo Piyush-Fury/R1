@@ -1,59 +1,35 @@
-name: Sync to R2
+name: Sync Changes to R2
 
 on:
   push:
     branches:
-      - main  # Trigger for main branch pushes
+      - main  # Trigger on push to main branch
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout R1
+      - name: Checkout Repository R1
         uses: actions/checkout@v3
+        
+      - name: Set up Git
+        uses: actions/setup-git@v2
+        
+      - name: Clone Repository R2
+        run: git clone https://github.com/Piyush-Fury/R2.git
 
-      - name: Setup Git
+      - name: Sync Changes to R2 with Prefix
         run: |
-          git config --global user.name 'Piyush Agrawal'
-          git config --global user.email 'https.piyush@gmail.com'
-
-      - name: Process Files (Add Prod- Prefix)
-        run: |
-          for file in $(find . -type f); do
-            if [[ $(basename $file) != Prod-* ]]; then
-              mv "$file" "$(dirname $file)/Prod-$(basename $file)"
+          cd repo2
+          git pull
+          for file in $(git diff --name-only HEAD~1..HEAD); do
+            if [[ -f "../$file" ]]; then
+              cp "../$file" "Prod-$file"
             fi
           done
-
-      - name: Replace Image Tags
-        run: |
-          # Example: Update Docker image tags
-          find . -type f -name 'Prod-*.yaml' -exec sed -i 's/image: .*:\(.*\)/image: myimage:\1/' {} \;
-
-      - name: Debug Token and Repository Access
-        run: |
-          echo "Token used: ${{ secrets.PAT }}"
-          git remote -v
-          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
-          git remote -v
-
-      - name: Initialize Git Repository
-        run: |
-          if [ ! -d ".git" ]; then
-            git init  # Initialize git if not already a git repository
-            git remote add origin https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git  # Add remote
-          fi
-
-      - name: Add and Commit Changes
-        run: |
           git add .
-          git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
-
-      - name: Push to R2 with PAT
-        run: |
-          git push https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
-
-      - name: Push to R2 with GITHUB_TOKEN (alternative method)
-        run: |
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Piyush-Fury/R2.git
+          git commit -m "Sync changes from R1 with prefix Prod-"
+          git push origin main
+        
+      - name: Push to Repository R2
+        run: git push https://github.com/Piyush-Fury/R2.git main
