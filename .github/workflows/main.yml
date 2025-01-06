@@ -18,14 +18,8 @@ jobs:
           git config --global user.name 'Piyush Agrawal'
           git config --global user.email 'https.piyush@gmail.com'
 
-      - name: Clone R2
-        run: |
-          git clone https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
-          rsync -av --exclude='.git' --exclude='R2' --exclude='.github/workflows' ./ R2/
-
       - name: Process Files (Add Prod- Prefix)
         run: |
-          cd R2
           for file in $(find . -type f); do
             if [[ $(basename $file) != Prod-* ]]; then
               mv "$file" "$(dirname $file)/Prod-$(basename $file)"
@@ -34,7 +28,6 @@ jobs:
 
       - name: Replace Image Tags
         run: |
-          cd R2
           # Example: Update Docker image tags
           find . -type f -name 'Prod-*.yaml' -exec sed -i 's/image: .*:\(.*\)/image: myimage:\1/' {} \;
 
@@ -47,7 +40,6 @@ jobs:
 
       - name: Push to R2 with PAT
         run: |
-          cd R2
           git add .
           git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
           git branch -M main
@@ -55,5 +47,4 @@ jobs:
 
       - name: Push to R2 with GITHUB_TOKEN (alternative method)
         run: |
-          cd R2
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Piyush-Fury/R2.git
