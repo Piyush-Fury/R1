@@ -21,7 +21,7 @@ jobs:
       - name: Clone R2
         run: |
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Piyush-Fury/R2.git
-          rsync -av --exclude='.git' --exclude='R2' ./ R2/
+          rsync -av --exclude='.git' --exclude='R2' --exclude='.github/workflows' ./ R2/
 
       - name: Process Files (Add Prod- Prefix)
         run: |
