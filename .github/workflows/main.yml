@@ -20,7 +20,7 @@ jobs:
 
       - name: Clone R2
         run: |
-          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Piyush-Fury/R2.git
+          git clone https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
           rsync -av --exclude='.git' --exclude='R2' --exclude='.github/workflows' ./ R2/
 
       - name: Process Files (Add Prod- Prefix)
@@ -37,7 +37,7 @@ jobs:
           cd R2
           # Example: Update Docker image tags
           find . -type f -name 'Prod-*.yaml' -exec sed -i 's/image: .*:\(.*\)/image: myimage:\1/' {} \;
-      
+
       - name: Push to R2
         run: |
           cd R2
