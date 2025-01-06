@@ -15,18 +15,18 @@ jobs:
 
       - name: Set up Git for Repository R2
         run: |
-          git config --global user.name "Your Name"
-          git config --global user.email "your-email@example.com"
+          git config --global user.name "Piyush Agrawal"
+          git config --global user.email "https.piyush@gmail.com"
 
       - name: Clone Repository R2
         run: |
-          git clone https://github.com/your-username/repo2.git
-          cd repo2
+          git clone https://github.com/Piyush-Fury/R2.git
+          cd R2
           git checkout main  # Ensure you're on the right branch (change if needed)
 
       - name: Sync Changes from R1 to R2
         run: |
-          cd repo2
+          cd R2
           # Copy the files from R1 to R2, but avoid copying the R2 directory itself
           cp -r ../* .  # This copies all files except the repo2 directory
           git add .
