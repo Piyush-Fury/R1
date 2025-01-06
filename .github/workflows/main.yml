@@ -1,32 +1,34 @@
-name: Sync Changes to R2
+name: Sync R1 to R2
 
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main  # Trigger the action on push to the main branch (change to match your branch if necessary)
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository R1
         uses: actions/checkout@v3
-      
-      - name: Clone Repository R2
-        run: git clone https://github.com/Piyush-Fury/R2.git
 
-      - name: Sync Changes to R2 with Prefix
+      - name: Set up Git for Repository R2
         run: |
-          cd repo2
-          git pull
-          for file in $(git diff --name-only HEAD~1..HEAD); do
-            if [[ -f "../$file" ]]; then
-              cp "../$file" "Prod-$file"
-            fi
-          done
-          git add .
-          git commit -m "Sync changes from R1 with prefix Prod-"
-          git push origin main
+          git config --global user.name "Piyush Agrawal"
+          git config --global user.email "https.piyush@gmail.com"
 
-      - name: Push to Repository R2
-        run: git push https://github.com/Piyush-Fury/R2.git main
+      - name: Clone Repository R2
+        run: |
+          git clone https://github.com/Piyush-Fury/R2.git
+          cd R2
+          git checkout main  # Ensure you're on the right branch (change if needed)
+
+      - name: Sync Changes from R1 to R2
+        run: |
+          cd R2
+          # Copy the changes from R1 to R2
+          cp -r ../* .  # This copies the content of R1 to R2, you can modify this to include/exclude specific files
+          git add .
+          git commit -m "Sync changes from R1 to R2"
+          git push origin main
