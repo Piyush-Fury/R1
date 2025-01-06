@@ -3,7 +3,7 @@ name: Sync Changes to R2
 on:
   push:
     branches:
-      - main  # Trigger on push to main branch
+      - main  # Trigger on push to the main branch
 
 jobs:
   sync:
@@ -11,12 +11,9 @@ jobs:
     steps:
       - name: Checkout Repository R1
         uses: actions/checkout@v3
-        
-      - name: Set up Git
-        uses: actions/setup-git@v2
-        
+      
       - name: Clone Repository R2
-        run: git clone https://github.com/Piyush-Fury/R2.git
+        run: git clone https://github.com/user/repo2.git
 
       - name: Sync Changes to R2 with Prefix
         run: |
@@ -30,6 +27,6 @@ jobs:
           git add .
           git commit -m "Sync changes from R1 with prefix Prod-"
           git push origin main
-        
+
       - name: Push to Repository R2
-        run: git push https://github.com/Piyush-Fury/R2.git main
+        run: git push https://github.com/user/repo2.git main
