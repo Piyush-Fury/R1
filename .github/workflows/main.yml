@@ -38,7 +38,7 @@ jobs:
           # Example: Update Docker image tags
           find . -type f -name 'Prod-*.yaml' -exec sed -i 's/image: .*:\(.*\)/image: myimage:\1/' {} \;
 
-      - name: Push to R2
+      - name: Push to R2 with PAT
         run: |
           cd R2
           git add .
