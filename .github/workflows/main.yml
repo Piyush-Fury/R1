@@ -31,4 +31,6 @@ jobs:
           rsync -av --exclude='.git' ../* .  # This copies everything except .git
           git add .
           git commit -m "Sync changes from R1 to R2"
-          git push origin main
+          
+          # Use the GitHub token for authentication
+          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/Piyush-Fury/R2.git main
