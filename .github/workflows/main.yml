@@ -15,7 +15,7 @@ jobs:
 
       - name: Setup Git
         run: |
-          git config --global user.name 'GitHub Action'
+          git config --global user.name 'Piyush Agrawal'
           git config --global user.email 'https.piyush@gmail.com'
 
       - name: Clone R2
