@@ -37,10 +37,19 @@ jobs:
           cd R2
           # Example: Update Docker image tags
           find . -type f -name 'Prod-*.yaml' -exec sed -i 's/image: .*:\(.*\)/image: myimage:\1/' {} \;
-
+      
       - name: Push to R2
         run: |
           cd R2
+          git remote set-url origin https://x-access-token:${{ secrets.PAT }}@github.com/USERNAME/R2.git
           git add .
           git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
-          git push || echo "No changes to push"
+          git push
+
+
+ #     - name: Push to R2
+  #      run: |
+   #       cd R2
+    #      git add .
+     #     git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
+      #    git push || echo "No changes to push"
