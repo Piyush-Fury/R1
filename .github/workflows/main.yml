@@ -28,7 +28,7 @@ jobs:
         run: |
           cd R2
           # Copy files from R1 to R2 using rsync and exclude .git directory
-          rsync -av --exclude='.git' ../* .  # This copies everything except .git
+          rsync -av --exclude='.git' ../ .  # This copies everything except .git
           git add .
           git commit -m "Sync changes from R1 to R2"
           
