@@ -21,7 +21,6 @@ jobs:
       - name: Clone Repository R2
         run: |
           git clone https://github.com/Piyush-Fury/R2.git
-          cd R2
           git checkout main  # Ensure you're on the right branch (change if needed)
 
       - name: Sync Changes from R1 to R2
