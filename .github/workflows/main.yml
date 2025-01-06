@@ -26,7 +26,9 @@ jobs:
 
       - name: Sync Changes from R1 to R2
         run: |
-          rsync -av --exclude='.git' --exclude='.github' $GITHUB_WORKSPACE/ R2/  # Sync directly to R2 folder
+          # Sync only the contents of R1, not the parent directory
+          rsync -av --exclude='.git' --exclude='.github' $GITHUB_WORKSPACE/ R2/
+
           cd R2
           git add .
           git commit -m "Sync changes from R1 to R2"
