@@ -20,7 +20,7 @@ jobs:
 
       - name: Clone R2
         run: |
-          git clone https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Piyush-Fury/R2.git
           rsync -av --exclude='.git' --exclude='R2' --exclude='.github/workflows' ./ R2/
 
       - name: Process Files (Add Prod- Prefix)
@@ -44,4 +44,4 @@ jobs:
           git add .
           git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
           git branch -M main
-          git push -u origin main
+          git push https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
