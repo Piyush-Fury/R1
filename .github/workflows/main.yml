@@ -52,3 +52,8 @@ jobs:
           git commit -m "Sync from R1 - Automated by GitHub Actions" || echo "No changes to commit"
           git branch -M main
           git push https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git
+
+      - name: Push to R2 with GITHUB_TOKEN (alternative method)
+        run: |
+          cd R2
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Piyush-Fury/R2.git
