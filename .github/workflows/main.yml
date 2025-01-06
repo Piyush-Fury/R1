@@ -40,8 +40,10 @@ jobs:
 
       - name: Initialize Git Repository
         run: |
-          git init  # Ensure the repository is initialized
-          git remote add origin https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git  # Add remote if not already added
+          if [ ! -d ".git" ]; then
+            git init  # Initialize git if not already a git repository
+            git remote add origin https://x-access-token:${{ secrets.PAT }}@github.com/Piyush-Fury/R2.git  # Add remote
+          fi
 
       - name: Add and Commit Changes
         run: |
