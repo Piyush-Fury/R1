@@ -51,14 +51,14 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       # Common Setup
-      - name: Set up Python 3.11
+      - name: Set up Python 3.9
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: 3.9
 
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install scoutsuite
           
 
@@ -75,7 +75,11 @@ jobs:
       - name: Scan
         run: |
           REPORT_DIR="./reports/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
-          scout ${CLOUD_PROVIDER} --no-browser --report-dir "${REPORT_DIR}" || true
+          if [[ "$CLOUD_PROVIDER" == "gcp" ]]; then
+              scout gcp --no-browser --report-dir "${REPORT_DIR}" -s <(echo '${{ secrets.GCP_CREDENTIALS }}') || true
+          else
+              scout aws --no-browser --report-dir "${REPORT_DIR}" || true
+          fi
 
       # Archive Report
       - name: Archive
