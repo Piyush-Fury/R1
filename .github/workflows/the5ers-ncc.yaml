@@ -1,0 +1,100 @@
+name: NCC Scoute Suite
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: 'The environment to deploy to'
+
+jobs:
+  ncc-monthly-scan:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Determine Cloud Provider (AWS/GCP)
+      - name: Set Cloud Provider
+        run: |
+          if [[ "${{ inputs.environment }}" == the5ers-* ]]; then
+            echo "CLOUD_PROVIDER=aws" >> $GITHUB_ENV
+          else
+            echo "CLOUD_PROVIDER=gcp" >> $GITHUB_ENV
+          fi
+
+      # AWS Credential Setup (ONLY for AWS)
+      - name: Configure AWS Credentials
+        if: env.CLOUD_PROVIDER == 'aws'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.GH_OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME }}
+
+      # GCP Credential Setup (ONLY for GCP)
+      - name: Authenticate to GCP
+        if: env.CLOUD_PROVIDER == 'gcp'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      # Common Setup
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install scoutsuite
+          
+
+      # Set Account Name Variable Based on Cloud Provider
+      - name: Set Account Name
+        run: |
+          if [[ "$CLOUD_PROVIDER" == "aws" ]]; then
+            echo "ACCOUNT_NAME=${{ secrets.AWS_ACCOUNT_NAME }}" >> $GITHUB_ENV
+          else
+            echo "ACCOUNT_NAME=${{ secrets.GCP_PROJECT_NAME }}" >> $GITHUB_ENV
+          fi
+
+      # Scan Step
+      - name: Scan
+        run: |
+          REPORT_DIR="./reports/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
+          scout ${CLOUD_PROVIDER} --no-browser --report-dir "${REPORT_DIR}" || true
+
+      # Archive Report
+      - name: Archive
+        run: |
+          DATE="$(date -u +"%Y-%m-%d")"
+          REPORT_DIR="./reports/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
+          ARCHIVE_FILE="ncc-scout-suite-report-${DATE}.tar.gz"
+          tar -zcvf "${ARCHIVE_FILE}" "${REPORT_DIR}"
+
+      # Upload Report to S3 (for both AWS & GCP)
+      - name: Upload Report to S3
+        run: |
+          DATE="$(date -u +"%Y-%m-%d")"
+          ARCHIVE_FILE="ncc-scout-suite-report-${DATE}.tar.gz"
+          
+          # Common S3 Bucket for all reports
+          S3_BUCKET="s3://ncc-scout-suite-401168514516"
+          S3_TARGET_DIR="${S3_BUCKET}/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
+          S3_FILE_PATH="${S3_TARGET_DIR}/${ARCHIVE_FILE}"
+
+          echo "Uploading report to: ${S3_FILE_PATH}"
+          aws s3 cp "${ARCHIVE_FILE}" "${S3_FILE_PATH}"
