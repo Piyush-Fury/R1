@@ -92,7 +92,7 @@ jobs:
           ARCHIVE_FILE="ncc-scout-suite-report-${DATE}.tar.gz"
           
           # Common S3 Bucket for all reports
-          S3_BUCKET="s3://ncc-scout-suite-401168514516"
+          S3_BUCKET="s3://the5ers-scout-suite-reports"
           S3_TARGET_DIR="${S3_BUCKET}/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
           S3_FILE_PATH="${S3_TARGET_DIR}/${ARCHIVE_FILE}"
 
