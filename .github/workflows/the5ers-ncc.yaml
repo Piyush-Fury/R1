@@ -108,7 +108,7 @@ jobs:
 
           elif [[ "$CLOUD_PROVIDER" == "gcp" ]]; then
             # GCP GCS Upload
-            GCS_BUCKET="gs://ttp-staging-scout-suite-reports"
+            GCS_BUCKET="gs://the5ers-scout-suite-report"
             GCS_TARGET_DIR="${GCS_BUCKET}/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
             GCS_FILE_PATH="${GCS_TARGET_DIR}/${ARCHIVE_FILE}"
             
