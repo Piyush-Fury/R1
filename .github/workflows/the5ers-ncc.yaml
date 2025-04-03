@@ -75,8 +75,9 @@ jobs:
       - name: Scan
         run: |
           REPORT_DIR="./reports/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
+          echo '${{ secrets.GCP_CREDENTIALS }}' > /tmp/gcp-key.json
           if [[ "$CLOUD_PROVIDER" == "gcp" ]]; then
-              scout gcp --no-browser --report-dir "${REPORT_DIR}" -s <(echo '${{ secrets.GCP_CREDENTIALS }}') || true
+              scout gcp --no-browser --report-dir "${REPORT_DIR}" -s /tmp/gcp-key.json || true
           else
               scout aws --no-browser --report-dir "${REPORT_DIR}" || true
           fi
