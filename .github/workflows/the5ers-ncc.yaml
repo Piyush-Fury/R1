@@ -50,14 +50,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Configure AWS Credentials (For GCP Upload)
-        if: env.CLOUD_PROVIDER == 'gcp'
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.GH_OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME }}
-
 
       # Common Setup
       - name: Set up Python 3.11
@@ -100,15 +92,30 @@ jobs:
           tar -zcvf "${ARCHIVE_FILE}" "${REPORT_DIR}"
 
       # Upload Report to S3 (for both AWS & GCP)
-      - name: Upload Report to S3
+      - name: Upload Cloud Provider Report
         run: |
           DATE="$(date -u +"%Y-%m-%d")"
           ARCHIVE_FILE="ncc-scout-suite-report-${DATE}.tar.gz"
-          
-          # Common S3 Bucket for all reports
-          S3_BUCKET="s3://the5ers-scout-suite-reports"
-          S3_TARGET_DIR="${S3_BUCKET}/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
-          S3_FILE_PATH="${S3_TARGET_DIR}/${ARCHIVE_FILE}"
 
-          echo "Uploading report to: ${S3_FILE_PATH}"
-          aws s3 cp "${ARCHIVE_FILE}" "${S3_FILE_PATH}"
+          if [[ "$CLOUD_PROVIDER" == "aws" ]]; then
+            # AWS S3 Upload
+            S3_BUCKET="s3://the5ers-scout-suite-reports"
+            S3_TARGET_DIR="${S3_BUCKET}/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
+            S3_FILE_PATH="${S3_TARGET_DIR}/${ARCHIVE_FILE}"
+            
+            echo "Uploading AWS report to: ${S3_FILE_PATH}"
+            aws s3 cp "${ARCHIVE_FILE}" "${S3_FILE_PATH}"
+
+          elif [[ "$CLOUD_PROVIDER" == "gcp" ]]; then
+            # GCP GCS Upload
+            GCS_BUCKET="gs://ttp-staging-scout-suite-reports"
+            GCS_TARGET_DIR="${GCS_BUCKET}/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
+            GCS_FILE_PATH="${GCS_TARGET_DIR}/${ARCHIVE_FILE}"
+            
+            echo "Uploading GCP report to: ${GCS_FILE_PATH}"
+            gsutil cp "${ARCHIVE_FILE}" "${GCS_FILE_PATH}"
+
+          else
+            echo "Error: Unsupported CLOUD_PROVIDER '$CLOUD_PROVIDER' (must be 'aws' or 'gcp')"
+            exit 1
+          fi
