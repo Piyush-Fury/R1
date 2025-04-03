@@ -1,0 +1,46 @@
+name: NCC Scout Suite Monthly Scan
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+on:
+  schedule:
+    - cron: '0 0 1 * *' 
+
+jobs:
+  # staging-account:
+  #   name: Run NCC Scout for staging Account
+  #   uses: ./.github/workflows/ncc.yml
+  #   secrets: inherit
+  #   with:
+  #     environment: the5ers-staging
+
+  prod-account:
+    name: Run NCC Scout for Prod Account
+    uses: ./.github/workflows/ncc.yml
+    secrets: inherit
+    with:
+      environment: the5ers-production
+
+  root-account:
+    name: Run NCC Scout for root Account
+    uses: ./.github/workflows/ncc.yml
+    secrets: inherit
+    with:
+      environment: the5ers-root
+  
+  ttp-staging-account:
+    name: Run NCC Scout for ttp-staging Account
+    uses: ./.github/workflows/ncc.yml
+    secrets: inherit
+    with:
+      environment: the5ers-ttp-staging
+
+  ttp-prod-account:
+    name: Run NCC Scout for ttp-prod Account
+    uses: ./.github/workflows/ncc.yml
+    secrets: inherit
+    with:
+      environment: the5ers-ttp-prod
