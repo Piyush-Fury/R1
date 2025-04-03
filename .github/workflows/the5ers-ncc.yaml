@@ -50,6 +50,15 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
+      - name: Configure AWS Credentials (For GCP Upload)
+        if: env.CLOUD_PROVIDER == 'gcp'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.GH_OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME }}
+
+
       # Common Setup
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
