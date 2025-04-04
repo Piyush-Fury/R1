@@ -75,6 +75,9 @@ jobs:
       - name: List GCS Buckets (Verify Auth)
         if: env.CLOUD_PROVIDER == 'gcp'
         run: |
+          echo '${{ secrets.GCP_CREDENTIALS }}' > /tmp/gcp-key.json
+          gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+          gcloud auth list
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
           gsutil ls -p ttp-staging-422114
 
