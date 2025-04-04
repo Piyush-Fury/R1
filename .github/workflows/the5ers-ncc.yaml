@@ -72,12 +72,12 @@ jobs:
             echo "ACCOUNT_NAME=${{ secrets.GCP_PROJECT_NAME }}" >> $GITHUB_ENV
           fi
 
-      - name: Setup gsutil credentials
+      - name: List GCS Buckets (Verify Auth)
         if: env.CLOUD_PROVIDER == 'gcp'
         run: |
-          echo '${{ secrets.GCP_CREDENTIALS }}' > /tmp/gcp-creds.json
-          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-creds.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
           gsutil ls
+
 
 
 
