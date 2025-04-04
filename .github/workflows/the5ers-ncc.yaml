@@ -72,12 +72,20 @@ jobs:
             echo "ACCOUNT_NAME=${{ secrets.GCP_PROJECT_NAME }}" >> $GITHUB_ENV
           fi
 
+      - name: Setup gsutil credentials
+        if: env.CLOUD_PROVIDER == 'gcp'
+        run: |
+          echo '${{ secrets.GCP_CREDENTIALS }}' > /tmp/gcp-creds.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-creds.json
+          gsutil ls
+
+
+
       # Scan Step
       - name: Scan
         run: |
           REPORT_DIR="./reports/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
           echo '${{ secrets.GCP_CREDENTIALS }}' > /tmp/gcp-key.json
-          gsutil ls
           if [[ "$CLOUD_PROVIDER" == "gcp" ]]; then
               scout gcp --no-browser --report-dir "${REPORT_DIR}" -s /tmp/gcp-key.json || true
           else
