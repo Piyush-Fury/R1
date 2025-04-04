@@ -76,10 +76,7 @@ jobs:
         if: env.CLOUD_PROVIDER == 'gcp'
         run: |
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
-          gsutil ls
-
-
-
+          gsutil ls -p ttp-staging-422114
 
       # Scan Step
       - name: Scan
