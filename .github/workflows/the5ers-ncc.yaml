@@ -77,6 +77,7 @@ jobs:
         run: |
           REPORT_DIR="./reports/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
           echo '${{ secrets.GCP_CREDENTIALS }}' > /tmp/gcp-key.json
+          gsutil ls
           if [[ "$CLOUD_PROVIDER" == "gcp" ]]; then
               scout gcp --no-browser --report-dir "${REPORT_DIR}" -s /tmp/gcp-key.json || true
           else
