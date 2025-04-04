@@ -10,37 +10,41 @@ on:
     - cron: '0 0 1 * *' 
 
 jobs:
-  # staging-account:
-  #   name: Run NCC Scout for staging Account
-  #   uses: ./.github/workflows/ncc.yml
-  #   secrets: inherit
-  #   with:
-  #     environment: the5ers-staging
-
-  prod-account:
-    name: Run NCC Scout for Prod Account
+  staging-account:
+    name: Run NCC Scout for staging Account
     uses: ./.github/workflows/ncc.yml
     secrets: inherit
     with:
-      environment: the5ers-production
+      environment: the5ers-staging
 
   root-account:
     name: Run NCC Scout for root Account
+    needs: staging-account
     uses: ./.github/workflows/ncc.yml
     secrets: inherit
     with:
       environment: the5ers-root
+
+  prod-account:
+    name: Run NCare C Scout for Prod Account
+    needs: root-account
+    uses: ./.github/workflows/ncc.yml
+    secrets: inherit
+    with:
+      environment: the5ers-production
   
   ttp-staging-account:
     name: Run NCC Scout for ttp-staging Account
+    needs: prod-account
     uses: ./.github/workflows/ncc.yml
     secrets: inherit
     with:
-      environment: the5ers-ttp-staging
+      environment: ttp-staging
 
   ttp-prod-account:
     name: Run NCC Scout for ttp-prod Account
+    needs: ttp-staging-account
     uses: ./.github/workflows/ncc.yml
     secrets: inherit
     with:
-      environment: the5ers-ttp-prod
+      environment: ttp-prod
