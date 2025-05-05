@@ -19,7 +19,6 @@ jobs:
 
   root-account:
     name: Run NCC Scout for root Account
-    needs: staging-account
     uses: ./.github/workflows/ncc.yml
     secrets: inherit
     with:
@@ -27,7 +26,6 @@ jobs:
 
   prod-account:
     name: Run NCare C Scout for Prod Account
-    needs: root-account
     uses: ./.github/workflows/ncc.yml
     secrets: inherit
     with:
@@ -35,7 +33,6 @@ jobs:
   
   ttp-staging-account:
     name: Run NCC Scout for ttp-staging Account
-    needs: prod-account
     uses: ./.github/workflows/ncc.yml
     secrets: inherit
     with:
@@ -43,7 +40,6 @@ jobs:
 
   ttp-prod-account:
     name: Run NCC Scout for ttp-prod Account
-    needs: ttp-staging-account
     uses: ./.github/workflows/ncc.yml
     secrets: inherit
     with:
