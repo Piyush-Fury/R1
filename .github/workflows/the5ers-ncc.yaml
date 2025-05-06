@@ -137,10 +137,11 @@ jobs:
           method: files.uploadV2
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
+            ARCHIVE_FILE="ncc-scout-suite-report-${DATE}.tar.gz"
             channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
             initial_comment: "Scout Suite report for *ttp-staging* environment is ready. 📄"
-            file: "ncc-scout-suite-report-${DATE}.tar.gz"
-            filename: "ncc-scout-suite-report-${DATE}.tar.gz"
+            file: "${ARCHIVE_FILE}"
+            filename: "${ARCHIVE_FILE}"
  #     - name: Upload Report to Slack
  #       uses: slackapi/slack-github-action@v1.24.0
  #       with:
