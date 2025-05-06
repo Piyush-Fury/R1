@@ -1,0 +1,66 @@
+name: Send Consolidated Reports
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 0 1 * *'  # Runs at 00:15 UTC on the 1st day of every month
+
+jobs:
+  send-reports:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set DATE variable
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.GH_OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Activate Service Account
+        run: |
+          echo "${{ secrets.GCP_CREDENTIALS }}" > /tmp/gcp-key.json
+          gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+          gcloud auth list
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-key.json" >> $GITHUB_ENV
+
+      - name: Install gsutil
+        run: |
+          sudo apt-get update && sudo apt-get install -y google-cloud-sdk
+
+      - name: Create reports directory
+        run: mkdir reports
+
+      - name: Download AWS reports
+        run: |
+          aws s3 cp s3://the5ers-scout-suite-reports/aws/the5ers-production/ncc-scout-suite-report-${{ env.DATE }}.tar.gz reports/
+          aws s3 cp s3://the5ers-scout-suite-reports/aws/the5ers-root/ncc-scout-suite-report-${{ env.DATE }}.tar.gz reports/
+          aws s3 cp s3://the5ers-scout-suite-reports/aws/the5ers-staging/ncc-scout-suite-report-${{ env.DATE }}.tar.gz reports/
+
+      - name: Download GCP reports
+        run: |
+          gsutil cp gs://the5ers-scout-suite-report/gcp/ttp-staging/ncc-scout-suite-report-${{ env.DATE }}.tar.gz reports/
+          gsutil cp gs://the5ers-scout-suite-report/gcp/ttp-production/ncc-scout-suite-report-${{ env.DATE }}.tar.gz reports/
+
+      - name: Zip the reports directory
+        run: |
+          zip -r scout-suite-reports-${{ env.DATE }}.zip reports
+
+      - name: Upload zipped reports to Slack
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          method: files.uploadV2
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+            initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
+            file: "scout-suite-reports-${{ env.DATE }}.zip reports"
+            filename: "scout-suite-reports-${{ env.DATE }}.zip reports"
