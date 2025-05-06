@@ -1,5 +1,10 @@
 name: Send Consolidated Reports
 
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
 on:
   workflow_dispatch:
   schedule:
