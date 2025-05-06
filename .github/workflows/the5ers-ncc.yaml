@@ -94,6 +94,7 @@ jobs:
 
       # Archive Report
       - name: Archive
+        id: archive-report
         run: |
           DATE="$(date -u +"%Y-%m-%d")"
           REPORT_DIR="./reports/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
@@ -135,8 +136,8 @@ jobs:
         uses: adrey/slack-file-upload-action@master
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
-          path: ${{ steps.archive.outputs.archive_file }}
+          path: ${{ steps.archive-report.outputs.archive_file }}  # Updated reference
           channel: ${{ secrets.SLACK_CHANNEL_ID }}
-          filename: ${{ steps.archive.outputs.archive_file }}
+          filename: ${{ steps.archive-report.outputs.archive_file }}  # Updated reference
           initial_comment: "Scout Suite report for ${{ inputs.environment }} environment."
           title: "Scout Suite Report - ${{ inputs.environment }}"
