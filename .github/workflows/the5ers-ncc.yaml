@@ -128,3 +128,14 @@ jobs:
             echo "Error: Unsupported CLOUD_PROVIDER '$CLOUD_PROVIDER' (must be 'aws' or 'gcp')"
             exit 1
           fi
+          
+      # Upload Report to Slack
+      - name: Upload Report to Slack
+        uses: adrey/slack-file-upload-action@master
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          path: ${{ steps.archive.outputs.archive_file }}
+          channel: ${{ secrets.SLACK_CHANNEL_ID }}
+          filename: ${{ steps.archive.outputs.archive_file }}
+          initial_comment: "Scout Suite report for ${{ inputs.environment }} environment."
+          title: "Scout Suite Report - ${{ inputs.environment }}"
