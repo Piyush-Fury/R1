@@ -131,13 +131,11 @@ jobs:
             exit 1
           fi
           
-      # Upload Report to Slack
       - name: Upload Report to Slack
-        uses: adrey/slack-file-upload-action@master
+        uses: slackapi/slack-github-action@v1.24.0
         with:
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          path: ${{ steps.archive-report.outputs.archive_file }}  # Updated reference
-          channel: ${{ secrets.SLACK_CHANNEL_ID }}
-          filename: ${{ steps.archive-report.outputs.archive_file }}  # Updated reference
-          initial_comment: "Scout Suite report for ${{ inputs.environment }} environment."
-          title: "Scout Suite Report - ${{ inputs.environment }}"
+          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          slack-message: "Scout Suite report for ${{ inputs.environment }} environment."
+          upload-files: ${{ steps.archive-report.outputs.archive_file }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
