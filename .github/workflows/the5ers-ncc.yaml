@@ -98,6 +98,7 @@ jobs:
           DATE="$(date -u +"%Y-%m-%d")"
           REPORT_DIR="./reports/${CLOUD_PROVIDER}/${ACCOUNT_NAME}"
           ARCHIVE_FILE="ncc-scout-suite-report-${DATE}.tar.gz"
+          echo "archive_file=${ARCHIVE_FILE}" >> $GITHUB_OUTPUT
           tar -zcvf "${ARCHIVE_FILE}" "${REPORT_DIR}"
 
       # Upload Report to S3 (for both AWS & GCP)
