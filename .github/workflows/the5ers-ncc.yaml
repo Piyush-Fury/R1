@@ -139,8 +139,8 @@ jobs:
           payload: |
             channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
             initial_comment: "Scout Suite report for *ttp-staging* environment is ready. 📄"
-            file: "ncc-scout-suite-report-${{ github.run_id }}.tar.gz"
-            filename: "scout-suite-report-${{ github.run_id }}.tar.gz"
+            file: "ncc-scout-suite-report-${DATE}.tar.gz"
+            filename: "ncc-scout-suite-report-${DATE}.tar.gz"
  #     - name: Upload Report to Slack
  #       uses: slackapi/slack-github-action@v1.24.0
  #       with:
