@@ -131,13 +131,25 @@ jobs:
             exit 1
           fi
 
-      - name: Upload Report to Slack via API
+      - name: Upload Report to Slack
         run: |
-          curl -F file=@${{ steps.archive-report.outputs.archive_file }} \
-               -F "initial_comment=Scout Suite report for ${{ inputs.environment }} environment." \
-               -F channels=${{ secrets.SLACK_CHANNEL_ID }} \
-               -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
-               https://slack.com/api/files.upload
+          # First upload to Slack and get the file URL
+          RESPONSE=$(curl -s -F file=@${{ steps.archive-report.outputs.archive_file }} \
+                   -F "initial_comment=Scout Suite report for ${{ inputs.environment }}" \
+                   -F channels=${{ secrets.SLACK_CHANNEL_ID }} \
+                   -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+                   https://slack.com/api/files.uploadV2)  # Note the V2 endpoint
+          
+          echo "Slack API Response: $RESPONSE"
+          
+          # Check if upload was successful
+          if echo "$RESPONSE" | grep -q '"ok":true'; then
+            echo "File uploaded successfully"
+          else
+            echo "Failed to upload file"
+            echo "$RESPONSE"
+            exit 1
+          fi
  #     - name: Upload Report to Slack
  #       uses: slackapi/slack-github-action@v1.24.0
  #       with:
