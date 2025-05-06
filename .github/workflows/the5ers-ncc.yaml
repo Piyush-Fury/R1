@@ -131,26 +131,14 @@ jobs:
             exit 1
           fi
 
-      - name: Upload Report to Slack (Current API)
-        run: |
-          # Upload using the correct endpoint
-          RESPONSE=$(curl -s -X POST \
-            -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
-            -F "file=@${{ steps.archive-report.outputs.archive_file }}" \
-            -F "channels=${{ secrets.SLACK_CHANNEL_ID }}" \
-            -F "initial_comment=Scout Suite report for ${{ inputs.environment }}" \
-            "https://slack.com/api/files.upload")  # Standard endpoint (no V2)
-      
-          echo "API Response: $RESPONSE"
-      
-          # Check for success
-          if echo "$RESPONSE" | grep -q '"ok":true'; then
-            echo "✅ File uploaded successfully!"
-          else
-            echo "❌ Failed to upload file:"
-            echo "$RESPONSE"
-            exit 1
-          fi
+      - name: Upload same file to Slack
+        uses: adrey/slack-file-upload-action@master
+        with:
+          token: ${{ secrets.SLACK_TOKEN }}
+          path: ncc-scout-suite-report-2025-05-06.tar.gz
+          channel: ${{ secrets.SLACK_CHANNEL_ID }}
+          initial_comment: Scout Suite report for ttp-staging environment.
+          title: Scout Suite Report - ttp-staging
  #     - name: Upload Report to Slack
  #       uses: slackapi/slack-github-action@v1.24.0
  #       with:
