@@ -69,42 +69,6 @@ jobs:
           aws s3 cp $S3_URI reports/
           echo "Production success"
 
-          ################### this is For the5ers-root ######################
-          BUCKET_NAME="the5ers-scout-suite-reports"
-          PREFIX="aws/the5ers-root/"
-          
-          # Get the latest report path
-          AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
-          
-          # Remove the prefix from the path
-          AWS_REPORT_KEY="${AWS_REPORT_PATH#aws/}"
-          
-          # Construct the full S3 URI
-          S3_URI="s3://$BUCKET_NAME/$AWS_REPORT_KEY"
-          
-          # Print the constructed S3 URI
-          echo "Latest AWS report URI: $S3_URI"
-          
-          aws s3 cp $S3_URI reports/
-
-          ################# this is For the5ers-staging ########################
-          BUCKET_NAME="the5ers-scout-suite-reports"
-          PREFIX="aws/the5ers-staging/"
-          
-          # Get the latest report path
-          AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
-          
-          # Remove the prefix from the path
-          AWS_REPORT_KEY="${AWS_REPORT_PATH#aws/}"
-          
-          # Construct the full S3 URI
-          S3_URI="s3://$BUCKET_NAME/$AWS_REPORT_KEY"
-          
-          # Print the constructed S3 URI
-          echo "Latest AWS report URI: $S3_URI"
-
-          aws s3 cp $S3_URI reports/
-
       - name: Download GCP reports
         run: |
           # Get the latest report from the GCP bucket
