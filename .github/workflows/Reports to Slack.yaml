@@ -39,10 +39,6 @@ jobs:
           gcloud auth list
           echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
 
-      - name: Install gsutil
-        run: |
-          sudo apt-get update && sudo apt-get install -y google-cloud-sdk
-
       - name: Create reports directory
         run: mkdir reports
 
