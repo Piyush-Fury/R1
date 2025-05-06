@@ -61,7 +61,7 @@ jobs:
           # Construct the full S3 URI
           S3_URI="s3://$BUCKET_NAME/$AWS_REPORT_KEY"
 
-          aws s3 ls s3://the5ers-scout-suite-reports/the5ers-production/
+          aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-production/ --recursive
           
           # Print the constructed S3 URI
           echo "Latest AWS report URI: $S3_URI"
