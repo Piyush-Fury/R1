@@ -45,6 +45,12 @@ jobs:
       - name: Create reports directory
         run: mkdir reports
 
+      - name: Download GCP reports
+        run: |
+          # Get the latest report from the GCP bucket
+          GCP_REPORT_PATH=$(gsutil ls gs://the5ers-scout-suite-report/gcp/ttp-staging/* | sort | tail -n 1)
+          gsutil cp $GCP_REPORT_PATH reports/
+
       - name: Download AWS reports
         run: |
           # Get the latest report from the S3 bucket
@@ -56,13 +62,6 @@ jobs:
       
           AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-staging/ --recursive | sort | tail -n 1 | awk '{print $4}')
           aws s3 cp s3://$AWS_REPORT_PATH reports/
-
-
-      - name: Download GCP reports
-        run: |
-          # Get the latest report from the GCP bucket
-          GCP_REPORT_PATH=$(gsutil ls gs://the5ers-scout-suite-report/gcp/ttp-staging/* | sort | tail -n 1)
-          gsutil cp $GCP_REPORT_PATH reports/
 
 
       - name: Zip the reports directory
