@@ -130,12 +130,19 @@ jobs:
             echo "Error: Unsupported CLOUD_PROVIDER '$CLOUD_PROVIDER' (must be 'aws' or 'gcp')"
             exit 1
           fi
-          
-      - name: Upload Report to Slack
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
-          slack-message: "Scout Suite report for ${{ inputs.environment }} environment."
-          upload-files: ${{ steps.archive-report.outputs.archive_file }}
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - name: Upload Report to Slack via API
+        run: |
+          curl -F file=@${{ steps.archive-report.outputs.archive_file }} \
+               -F "initial_comment=Scout Suite report for ${{ inputs.environment }} environment." \
+               -F channels=${{ secrets.SLACK_CHANNEL_ID }} \
+               -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+               https://slack.com/api/files.upload
+ #     - name: Upload Report to Slack
+ #       uses: slackapi/slack-github-action@v1.24.0
+ #       with:
+ #         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+ #         slack-message: "Scout Suite report for ${{ inputs.environment }} environment."
+ #         upload-files: ${{ steps.archive-report.outputs.archive_file }}
+ #       env:
+ #         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
