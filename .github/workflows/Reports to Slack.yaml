@@ -57,14 +57,15 @@ jobs:
           
           # Get the latest report from the S3 bucket
           AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-production/* --recursive | sort | tail -n 1 | awk '{print $4}')
-          aws s3 cp $AWS_REPORT_PATH reports/
+
+          echo "Latest AWS report path: $AWS_REPORT_PATH"
+          aws s3 cp s3://$AWS_REPORT_PATH reports/
       
           AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-root/* --recursive | sort | tail -n 1 | awk '{print $4}')
-          aws s3 cp $AWS_REPORT_PATH reports/
+          aws s3 cp s3://$AWS_REPORT_PATH reports/
       
           AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-staging/* --recursive | sort | tail -n 1 | awk '{print $4}')
-          aws s3 cp $AWS_REPORT_PATH reports/
-
+          aws s3 cp s3://$AWS_REPORT_PATH reports/
 
       - name: Zip the reports directory
         run: |
