@@ -136,8 +136,6 @@ jobs:
         with:
           method: files.uploadV2
           token: ${{ secrets.SLACK_BOT_TOKEN }}
-          run: |
-            ARCHIVE_FILE="ncc-scout-suite-report-${DATE}.tar.gz"
           payload: |
             ARCHIVE_FILE="ncc-scout-suite-report-${DATE}.tar.gz"
             channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
