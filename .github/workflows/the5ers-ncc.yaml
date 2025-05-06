@@ -132,13 +132,15 @@ jobs:
           fi
 
       - name: Upload same file to Slack
-        uses: adrey/slack-file-upload-action@master
+        uses: slackapi/slack-github-action@v2.0.0
         with:
-          token: ${{ secrets.SLACK_TOKEN }}
-          path: ncc-scout-suite-report-2025-05-06.tar.gz
-          channel: ${{ secrets.SLACK_CHANNEL_ID }}
-          initial_comment: Scout Suite report for ttp-staging environment.
-          title: Scout Suite Report - ttp-staging
+          method: files.uploadV2
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+            initial_comment: "Scout Suite report for *ttp-staging* environment is ready. 📄"
+            file: "ncc-scout-suite-report-${{ github.run_id }}.tar.gz"
+            filename: "scout-suite-report-${{ github.run_id }}.tar.gz"
  #     - name: Upload Report to Slack
  #       uses: slackapi/slack-github-action@v1.24.0
  #       with:
