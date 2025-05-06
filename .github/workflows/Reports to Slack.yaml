@@ -17,6 +17,9 @@ jobs:
     environment: Download
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
       - name: Set DATE variable
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
