@@ -56,13 +56,13 @@ jobs:
           aws s3 ls
           
           # Get the latest report from the S3 bucket
-          AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-production/* --recursive | sort | tail -n 1 | awk '{print $4}')
+          AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-production/* --recursive | sort | tail -n 1)
           aws s3 cp s3://$AWS_REPORT_PATH reports/
       
-          AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-root/* --recursive | sort | tail -n 1 | awk '{print $4}')
+          AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-root/* --recursive | sort | tail -n 1)
           aws s3 cp s3://$AWS_REPORT_PATH reports/
       
-          AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-staging/* --recursive | sort | tail -n 1 | awk '{print $4}')
+          AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-staging/* --recursive | sort | tail -n 1)
           aws s3 cp s3://$AWS_REPORT_PATH reports/
 
 
