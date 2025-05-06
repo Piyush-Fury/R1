@@ -53,7 +53,7 @@ jobs:
 
       - name: Download AWS reports
         run: |
-          aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-production/*
+          aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-production/
           
           # Get the latest report from the S3 bucket
           AWS_REPORT_PATH=$(aws s3 ls s3://the5ers-scout-suite-reports/aws/the5ers-production/* --recursive | sort | tail -n 1 | awk '{print $4}')
