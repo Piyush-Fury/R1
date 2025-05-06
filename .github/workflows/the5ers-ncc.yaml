@@ -131,22 +131,23 @@ jobs:
             exit 1
           fi
 
-      - name: Upload Report to Slack
+      - name: Upload Report to Slack (Current API)
         run: |
-          # First upload to Slack and get the file URL
-          RESPONSE=$(curl -s -F file=@${{ steps.archive-report.outputs.archive_file }} \
-                   -F "initial_comment=Scout Suite report for ${{ inputs.environment }}" \
-                   -F channels=${{ secrets.SLACK_CHANNEL_ID }} \
-                   -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
-                   https://slack.com/api/files.uploadV2)  # Note the V2 endpoint
-          
-          echo "Slack API Response: $RESPONSE"
-          
-          # Check if upload was successful
+          # Upload using the correct endpoint
+          RESPONSE=$(curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
+            -F "file=@${{ steps.archive-report.outputs.archive_file }}" \
+            -F "channels=${{ secrets.SLACK_CHANNEL_ID }}" \
+            -F "initial_comment=Scout Suite report for ${{ inputs.environment }}" \
+            "https://slack.com/api/files.upload")  # Standard endpoint (no V2)
+      
+          echo "API Response: $RESPONSE"
+      
+          # Check for success
           if echo "$RESPONSE" | grep -q '"ok":true'; then
-            echo "File uploaded successfully"
+            echo "✅ File uploaded successfully!"
           else
-            echo "Failed to upload file"
+            echo "❌ Failed to upload file:"
             echo "$RESPONSE"
             exit 1
           fi
