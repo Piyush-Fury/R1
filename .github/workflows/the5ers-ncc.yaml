@@ -130,12 +130,12 @@ jobs:
             echo "Error: Unsupported CLOUD_PROVIDER '$CLOUD_PROVIDER' (must be 'aws' or 'gcp')"
             exit 1
           fi
+          
+      - name: Set DATE variable
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: List files in workspace
-        run: ls -la
 
-
-      - name: Upload same file to Slack
+      - name: Upload file to Slack
         uses: slackapi/slack-github-action@v2.0.0
         with:
           method: files.uploadV2
@@ -143,8 +143,9 @@ jobs:
           payload: |
             channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
             initial_comment: "Scout Suite report for *ttp-staging* environment is ready. 📄"
-            file: "ncc-scout-suite-report-${DATE}.tar.gz"
-            filename: "ncc-scout-suite-report-${DATE}.tar.gz"
+            file: "ncc-scout-suite-report-${{ env.DATE }}.tar.gz"
+            filename: "ncc-scout-suite-report-${{ env.DATE }}.tar.gz"
+
  #     - name: Upload Report to Slack
  #       uses: slackapi/slack-github-action@v1.24.0
  #       with:
