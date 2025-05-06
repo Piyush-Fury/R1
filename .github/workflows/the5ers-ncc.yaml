@@ -142,7 +142,7 @@ jobs:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           payload: |
             channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-            initial_comment: "Scout Suite report for *ttp-staging* environment is ready. 📄"
+            initial_comment: "Scout Suite report for *${{ inputs.environment }}* environment is ready. 📄"
             file: "ncc-scout-suite-report-${{ env.DATE }}.tar.gz"
             filename: "ncc-scout-suite-report-${{ env.DATE }}.tar.gz"
 
