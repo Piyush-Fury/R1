@@ -50,7 +50,6 @@ jobs:
       - name: Download GCP reports
         run: |
           gsutil cp gs://the5ers-scout-suite-report/gcp/ttp-staging/ncc-scout-suite-report-${{ env.DATE }}.tar.gz reports/
-          gsutil cp gs://the5ers-scout-suite-report/gcp/ttp-production/ncc-scout-suite-report-${{ env.DATE }}.tar.gz reports/
 
       - name: Zip the reports directory
         run: |
