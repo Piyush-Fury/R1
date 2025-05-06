@@ -60,11 +60,12 @@ jobs:
           
           # Construct the full S3 URI
           S3_URI="s3://$BUCKET_NAME/$AWS_REPORT_KEY"
+
+          aws s3 ls s3://the5ers-scout-suite-reports/the5ers-production/
           
           # Print the constructed S3 URI
           echo "Latest AWS report URI: $S3_URI"
 
-          aws s3 ls s3://the5ers-scout-suite-reports/the5ers-production/
 
           echo "Hello"
           aws s3 cp s3://the5ers-scout-suite-reports/the5ers-production/ncc-scout-suite-report-2025-05-05.tar.gz reports/
