@@ -66,6 +66,7 @@ jobs:
 
           echo "Latest AWS report path: $AWS_REPORT_PATH"
           aws s3 cp $S3_URI reports/
+          echo "Production success"
 
           ################### this is For the5ers-root ######################
           BUCKET_NAME="the5ers-scout-suite-reports"
@@ -82,10 +83,7 @@ jobs:
           
           # Print the constructed S3 URI
           echo "Latest AWS report URI: $S3_URI"
-
-          echo "Latest AWS report path: $AWS_REPORT_PATH"
-          aws s3 cp $S3_URI reports/
-
+          
           aws s3 cp $S3_URI reports/
 
           ################# this is For the5ers-staging ########################
@@ -103,9 +101,6 @@ jobs:
           
           # Print the constructed S3 URI
           echo "Latest AWS report URI: $S3_URI"
-
-          echo "Latest AWS report path: $AWS_REPORT_PATH"
-          aws s3 cp $S3_URI reports/
 
           aws s3 cp $S3_URI reports/
 
