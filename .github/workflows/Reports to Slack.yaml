@@ -206,18 +206,22 @@ jobs:
       #     to: "${{ secrets.EMAIL_TO }}"  # e.g., "team@the5ers.com"
       #     from: "IAM Operations <iamops@the5ers.com>"  # Must match verified domain!
       #     attachments: scout-suite-reports-${{ env.DATE }}.zip
-      - name: Send Email via AWS CLI (OIDC)
+      - name: Send Email via AWS CLI
         env:
           AWS_REGION: us-east-1
         run: |
-          # Generate the message.json file
-          cat << EOF > message.json
+          # Generate properly escaped JSON
+          ATTACHMENT_BASE64=$(base64 scout-suite-reports-${{ env.DATE }}.zip | tr -d '\n')
+          cat <<EOF > message.json
           {
-            "Data": "From: iamops@the5ers.com\nTo: ${{ secrets.EMAIL_TO }}\nSubject: Scout Suite Reports - ${{ env.DATE }}\nMIME-Version: 1.0\nContent-Type: multipart/mixed;\n\n--boundary\nContent-Type: text/html;\n\n<p>Reports attached.</p>\n\n--boundary\nContent-Type: application/zip\nContent-Disposition: attachment; filename=\"scout-suite-reports-${{ env.DATE }}.zip\"\nContent-Transfer-Encoding: base64\n\n$(base64 scout-suite-reports-${{ env.DATE }}.zip)\n\n--boundary--"
+            "Data": "From: iamops@the5ers.com\nTo: ${{ secrets.EMAIL_TO }}\nSubject: Scout Suite Reports - ${{ env.DATE }}\nMIME-Version: 1.0\nContent-Type: multipart/mixed; boundary=\"boundary\"\n\n--boundary\nContent-Type: text/html; charset=UTF-8\n\n<p>Reports attached.</p>\n\n--boundary\nContent-Type: application/zip\nContent-Disposition: attachment; filename=\"scout-suite-reports-${{ env.DATE }}.zip\"\nContent-Transfer-Encoding: base64\n\n${ATTACHMENT_BASE64}\n\n--boundary--"
           }
           EOF
       
-          # Send the email
+          # Validate JSON syntax first
+          jq empty message.json
+      
+          # Send email
           aws ses send-raw-email \
             --region $AWS_REGION \
             --raw-message file://message.json
