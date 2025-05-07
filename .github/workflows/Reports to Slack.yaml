@@ -188,20 +188,39 @@ jobs:
           role-to-assume: ${{ secrets.GH_OIDC_ROLE_ROOT }}
           aws-region: ${{ secrets.AWS_REGION_ROOT }}
           role-session-name: github-actions-session
+          
 
-      - name: Send Email via AWS SES
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: email-smtp.us-east-1.amazonaws.com
-          server_port: 587  # TLS (or 465 for SSL)
-          username: ${{ secrets.AWS_SES_SMTP_USERNAME }}  # From SES SMTP Credentials
-          password: ${{ secrets.AWS_SES_SMTP_PASSWORD }}  # From SES SMTP Credentials
-          subject: "Scout Suite Reports - ${{ env.DATE }}"
-          html_body: |
-            <p>Hello,</p>
-            <p>Attached are the latest Scout Suite reports.</p>
-            <p><strong>Date:</strong> ${{ env.DATE }}</p>
-            <p>Regards,<br>Security Team</p>
-          to: "${{ secrets.EMAIL_TO }}"  # e.g., "team@the5ers.com"
-          from: "IAM Operations <iamops@the5ers.com>"  # Must match verified domain!
-          attachments: scout-suite-reports-${{ env.DATE }}.zip
+      # - name: Send Email via AWS SES
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: email-smtp.us-east-1.amazonaws.com
+      #     server_port: 587  # TLS (or 465 for SSL)
+      #     username: ${{ secrets.AWS_SES_SMTP_USERNAME }}  # From SES SMTP Credentials
+      #     password: ${{ secrets.AWS_SES_SMTP_PASSWORD }}  # From SES SMTP Credentials
+      #     subject: "Scout Suite Reports - ${{ env.DATE }}"
+      #     html_body: |
+      #       <p>Hello,</p>
+      #       <p>Attached are the latest Scout Suite reports.</p>
+      #       <p><strong>Date:</strong> ${{ env.DATE }}</p>
+      #       <p>Regards,<br>Security Team</p>
+      #     to: "${{ secrets.EMAIL_TO }}"  # e.g., "team@the5ers.com"
+      #     from: "IAM Operations <iamops@the5ers.com>"  # Must match verified domain!
+      #     attachments: scout-suite-reports-${{ env.DATE }}.zip
+      - name: Send Email via AWS CLI (OIDC)
+        env:
+          AWS_REGION: us-east-1
+        run: |
+          # Generate the message.json file
+          cat << EOF > message.json
+          {
+            "Data": "From: iamops@the5ers.com\nTo: ${{ secrets.EMAIL_TO }}\nSubject: Scout Suite Reports - ${{ env.DATE }}\nMIME-Version: 1.0\nContent-Type: multipart/mixed;\n\n--boundary\nContent-Type: text/html;\n\n<p>Reports attached.</p>\n\n--boundary\nContent-Type: application/zip\nContent-Disposition: attachment; filename=\"scout-suite-reports-${{ env.DATE }}.zip\"\nContent-Transfer-Encoding: base64\n\n$(base64 scout-suite-reports-${{ env.DATE }}.zip)\n\n--boundary--"
+          }
+          EOF
+      
+          # Send the email
+          aws ses send-raw-email \
+            --region $AWS_REGION \
+            --raw-message file://message.json
+      
+          # Clean up
+          rm message.json
