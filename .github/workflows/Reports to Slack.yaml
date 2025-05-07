@@ -180,3 +180,22 @@ jobs:
             initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
             file: "scout-suite-reports-${{ env.DATE }}.zip"
             filename: "scout-suite-reports-${{ env.DATE }}.zip"
+
+      - name: Send Email via SMTP
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "Scout Suite Reports - ${{ env.DATE }}"
+          body: |
+            Hello,
+            Attached are the latest Scout Suite reports.
+            Date: ${{ env.DATE }}
+            Regards,
+            Security Team
+          to: ${{ secrets.EMAIL_TO }}
+          from: GitHub Actions
+          content_type: text/html
+          attachments: scout-suite-reports-${{ env.DATE }}.zip
