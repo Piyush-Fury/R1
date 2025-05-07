@@ -57,11 +57,8 @@ jobs:
 
       - name: Download GCP report
         run: |
-          GCP_BUCKET="the5ers-scout-suite-report"
-          GCP_PREFIX="gcp/ttp-staging/"
-          
-          # Get the latest report
-          GCP_REPORT_PATH=$(gsutil ls gs://$GCP_BUCKET/$GCP_PREFIX* | sort | tail -n 1)
+          # Get the latest report from the GCP bucket
+          GCP_REPORT_PATH=$(gsutil ls gs://the5ers-scout-suite-report/gcp/ttp-staging/* | sort | tail -n 1)
           
           echo "Downloading GCP report: $GCP_REPORT_PATH"
           gsutil cp "$GCP_REPORT_PATH" reports/gcp/
