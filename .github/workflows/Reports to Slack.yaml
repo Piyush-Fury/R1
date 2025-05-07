@@ -47,7 +47,7 @@ jobs:
           mkdir -p reports/aws
           mkdir -p reports/gcp
 
-      - name: Download AWS report
+      - name: Download AWS report (Production)
         run: |
           BUCKET_NAME="the5ers-scout-suite-reports"
           PREFIX="aws/the5ers-production/"
@@ -55,14 +55,44 @@ jobs:
           # Get the latest report
           AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
           
-          echo "Downloading AWS report: $AWS_REPORT_PATH"
+          echo "Downloading AWS Production report: $AWS_REPORT_PATH"
           aws s3 cp "s3://$BUCKET_NAME/$AWS_REPORT_PATH" reports/aws/
-
+      
           # Extract AWS report
           tar -xzf reports/aws/$(basename "$AWS_REPORT_PATH") -C reports/aws/
           rm reports/aws/$(basename "$AWS_REPORT_PATH")
 
-      - name: Download GCP report
+      - name: Download AWS report (Staging)
+        run: |
+          BUCKET_NAME="the5ers-scout-suite-reports"
+          PREFIX="aws/the5ers-staging/"
+          
+          # Get the latest report
+          AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
+          
+          echo "Downloading AWS Staging report: $AWS_REPORT_PATH"
+          aws s3 cp "s3://$BUCKET_NAME/$AWS_REPORT_PATH" reports/aws/
+      
+          # Extract AWS report
+          tar -xzf reports/aws/$(basename "$AWS_REPORT_PATH") -C reports/aws/
+          rm reports/aws/$(basename "$AWS_REPORT_PATH")
+      
+      - name: Download AWS report (Root)
+        run: |
+          BUCKET_NAME="the5ers-scout-suite-reports"
+          PREFIX="aws/the5ers-root/"
+          
+          # Get the latest report
+          AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
+          
+          echo "Downloading AWS Root report: $AWS_REPORT_PATH"
+          aws s3 cp "s3://$BUCKET_NAME/$AWS_REPORT_PATH" reports/aws/
+      
+          # Extract AWS report
+          tar -xzf reports/aws/$(basename "$AWS_REPORT_PATH") -C reports/aws/
+          rm reports/aws/$(basename "$AWS_REPORT_PATH")
+      
+      - name: Download GCP report (Staging)
         run: |
           GCP_BUCKET="the5ers-scout-suite-report"
           GCP_PREFIX="gcp/ttp-staging/"
@@ -70,12 +100,56 @@ jobs:
           # Get the latest report
           GCP_REPORT_PATH=$(gsutil ls gs://$GCP_BUCKET/$GCP_PREFIX* | sort | tail -n 1)
           
-          echo "Downloading GCP report: $GCP_REPORT_PATH"
+          echo "Downloading GCP Staging report: $GCP_REPORT_PATH"
           gsutil cp "$GCP_REPORT_PATH" reports/gcp/
-
+      
           # Extract GCP report
           tar -xzf reports/gcp/$(basename "$GCP_REPORT_PATH") -C reports/gcp/
           rm reports/gcp/$(basename "$GCP_REPORT_PATH")
+      
+      - name: Download GCP report (Production)
+        run: |
+          GCP_BUCKET="the5ers-scout-suite-report"
+          GCP_PREFIX="gcp/ttp-prod/"
+          
+          # Get the latest report
+          GCP_REPORT_PATH=$(gsutil ls gs://$GCP_BUCKET/$GCP_PREFIX* | sort | tail -n 1)
+          
+          echo "Downloading GCP Production report: $GCP_REPORT_PATH"
+          gsutil cp "$GCP_REPORT_PATH" reports/gcp/
+      
+          # Extract GCP report
+          tar -xzf reports/gcp/$(basename "$GCP_REPORT_PATH") -C reports/gcp/
+          rm reports/gcp/$(basename "$GCP_REPORT_PATH")
+      # - name: Download AWS report
+      #   run: |
+      #     BUCKET_NAME="the5ers-scout-suite-reports"
+      #     PREFIX="aws/the5ers-production/"
+          
+      #     # Get the latest report
+      #     AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
+          
+      #     echo "Downloading AWS report: $AWS_REPORT_PATH"
+      #     aws s3 cp "s3://$BUCKET_NAME/$AWS_REPORT_PATH" reports/aws/
+
+      #     # Extract AWS report
+      #     tar -xzf reports/aws/$(basename "$AWS_REPORT_PATH") -C reports/aws/
+      #     rm reports/aws/$(basename "$AWS_REPORT_PATH")
+
+      # - name: Download GCP report
+      #   run: |
+      #     GCP_BUCKET="the5ers-scout-suite-report"
+      #     GCP_PREFIX="gcp/ttp-staging/"
+          
+      #     # Get the latest report
+      #     GCP_REPORT_PATH=$(gsutil ls gs://$GCP_BUCKET/$GCP_PREFIX* | sort | tail -n 1)
+          
+      #     echo "Downloading GCP report: $GCP_REPORT_PATH"
+      #     gsutil cp "$GCP_REPORT_PATH" reports/gcp/
+
+      #     # Extract GCP report
+      #     tar -xzf reports/gcp/$(basename "$GCP_REPORT_PATH") -C reports/gcp/
+      #     rm reports/gcp/$(basename "$GCP_REPORT_PATH")
 
       - name: Verify downloaded content
         run: |
