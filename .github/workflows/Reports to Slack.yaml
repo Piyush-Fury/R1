@@ -22,12 +22,18 @@ jobs:
       - name: Set DATE variable
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ secrets.GH_OIDC_ROLE }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+      #     role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME }}
+      - name: Configure AWS Credentials to send mail from root account
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.GH_OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME }}
+          role-to-assume: ${{ secrets.GH_OIDC_ROLE_ROOT }}
+          aws-region: ${{ secrets.AWS_REGION_ROOT }}
+          role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME_ROOT }}
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -180,13 +186,6 @@ jobs:
             initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
             file: "scout-suite-reports-${{ env.DATE }}.zip"
             filename: "scout-suite-reports-${{ env.DATE }}.zip"
-
-      - name: Configure AWS Credentials to send mail from root account
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.GH_OIDC_ROLE_ROOT }}
-          aws-region: ${{ secrets.AWS_REGION_ROOT }}
-          role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME_ROOT }}
 
       - name: Send Email via AWS SES
         uses: dawidd6/action-send-mail@v3
