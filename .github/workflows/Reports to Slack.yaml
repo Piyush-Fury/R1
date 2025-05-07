@@ -13,7 +13,6 @@ on:
 jobs:
   send-reports:
     runs-on: ubuntu-latest
-
     environment: Download
 
     steps:
@@ -35,62 +34,57 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Activate Service Account
+      - name: Create clean workspace
         run: |
-          echo '${{ secrets.GCP_CREDENTIALS }}' > /tmp/gcp-key.json
-          gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-          gcloud auth list
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
+          rm -rf reports || true
+          mkdir -p reports/aws
+          mkdir -p reports/gcp
 
-      - name: Create reports directory
-        run: mkdir reports
-
-
-      - name: Download AWS reports
+      - name: Download AWS report
         run: |
-          ################### this is For the5ers-production ########################
           BUCKET_NAME="the5ers-scout-suite-reports"
           PREFIX="aws/the5ers-production/"
           
-          # Get the latest report path
-          # AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
+          # Get the latest report
+          AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
           
-          # Remove the prefix from the path
-          # AWS_REPORT_KEY="${AWS_REPORT_PATH#aws/}"
-          
-          # Construct the full S3 URI
-          # S3_URI="s3://$BUCKET_NAME/$AWS_REPORT_KEY"
-          
-          # Print the constructed S3 URI
-          # echo "Latest AWS report URI: $S3_URI"
+          echo "Downloading AWS report: $AWS_REPORT_PATH"
+          aws s3 cp "s3://$BUCKET_NAME/$AWS_REPORT_PATH" reports/aws/
 
-          # echo "Hello"
-          
-          # aws s3 cp $S3_URI reports/ --region ${{ secrets.AWS_REGION }}
-          #echo "Production success"
+          # Extract AWS report
+          tar -xzf reports/aws/$(basename "$AWS_REPORT_PATH") -C reports/aws/
+          rm reports/aws/$(basename "$AWS_REPORT_PATH")
 
-          AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print "s3://'$BUCKET_NAME'/"$4}')
-          
-          echo "Downloading AWS report from: $AWS_REPORT_PATH"
-          aws s3 cp "$AWS_REPORT_PATH" reports/
-
-      - name: Download GCP reports
+      - name: Download GCP report
         run: |
-          # Get the latest report from the GCP bucket
-          GCP_REPORT_PATH=$(gsutil ls gs://the5ers-scout-suite-report/gcp/ttp-staging/* | sort | tail -n 1)
-          gsutil cp $GCP_REPORT_PATH reports/
+          GCP_BUCKET="the5ers-scout-suite-report"
+          GCP_PREFIX="gcp/ttp-staging/"
           
-      - name: Zip the reports directory
-        run: |
-          zip -r scout-suite-reports-${{ env.DATE }}.zip reports
+          # Get the latest report
+          GCP_REPORT_PATH=$(gsutil ls gs://$GCP_BUCKET/$GCP_PREFIX* | sort | tail -n 1)
+          
+          echo "Downloading GCP report: $GCP_REPORT_PATH"
+          gsutil cp "$GCP_REPORT_PATH" reports/gcp/
 
-      - name: Upload zipped reports to Slack
+          # Extract GCP report
+          tar -xzf reports/gcp/$(basename "$GCP_REPORT_PATH") -C reports/gcp/
+          rm reports/gcp/$(basename "$GCP_REPORT_PATH")
+
+      - name: Verify downloaded content
+        run: |
+          echo "AWS content:"
+          ls -la reports/aws/
+          echo "GCP content:"
+          ls -la reports/gcp/
+
+      - name: Create consolidated zip
+        run: |
+          zip -r scout-suite-reports-${{ env.DATE }}.zip reports/
+
+      - name: Upload to Slack
         uses: slackapi/slack-github-action@v2.0.0
         with:
-          method: files.uploadV2
           token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-            initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
-            file: "scout-suite-reports-${{ env.DATE }}.zip"
-            filename: "scout-suite-reports-${{ env.DATE }}.zip"
+          channels: ${{ secrets.SLACK_CHANNEL_ID }}
+          file: scout-suite-reports-${{ env.DATE }}.zip
+          initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
