@@ -206,3 +206,45 @@ jobs:
       #     to: "${{ secrets.EMAIL_TO }}"  # e.g., "team@the5ers.com"
       #     from: "IAM Operations <iamops@the5ers.com>"  # Must match verified domain!
       #     attachments: scout-suite-reports-${{ env.DATE }}.zip
+      - name: Send Scout Suite Report via Email (SES)
+        env:
+          AWS_REGION: us-east-1
+          EMAIL_FROM: iamops@the5ers.com
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          DATE: ${{ env.DATE }}
+        run: |
+          # Encode the report zip in base64
+          base64 scout-suite-reports-${DATE}.zip | tr -d '\n' > attachment.b64
+      
+          # Create the raw email message
+          cat <<EOF > email.txt
+          From: iamops@the5ers.com
+          To: ${EMAIL_TO}
+          Subject: Scout Suite Reports - ${DATE}
+          MIME-Version: 1.0
+          Content-Type: multipart/mixed; boundary="MIMEBOUNDARY"
+          
+          --MIMEBOUNDARY
+          Content-Type: text/html; charset=UTF-8
+          Content-Transfer-Encoding: 7bit
+          
+          <html>
+          <body>
+          <p>Hello,</p>
+          <p>Attached are the latest Scout Suite reports.</p>
+          <p><strong>Date:</strong> ${DATE}</p>
+          <p>Regards,<br>Security Team</p>
+          </body>
+          </html>
+          
+          --MIMEBOUNDARY
+          Content-Type: application/zip
+          Content-Disposition: attachment; filename="scout-suite-reports-${DATE}.zip"
+          Content-Transfer-Encoding: base64
+          
+          $(cat attachment.b64)
+          --MIMEBOUNDARY--
+          EOF
+      
+          # Send the email using AWS CLI
+          aws ses send-raw-email --region $AWS_REGION --raw-message "Data=$(base64 -w 0 email.txt)"
