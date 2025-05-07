@@ -72,7 +72,7 @@ jobs:
           AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print "s3://'$BUCKET_NAME'/"$4}')
           
           echo "Downloading AWS report from: $AWS_REPORT_PATH"
-          aws s3 cp "$AWS_REPORT_PATH" reports/ --region ${{ secrets.AWS_REGION }}
+          aws s3 cp "$AWS_REPORT_PATH" reports/
 
       - name: Download GCP reports
         run: |
