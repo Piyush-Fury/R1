@@ -53,21 +53,26 @@ jobs:
           PREFIX="aws/the5ers-production/"
           
           # Get the latest report path
-          AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
+          # AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
           
           # Remove the prefix from the path
-          AWS_REPORT_KEY="${AWS_REPORT_PATH#aws/}"
+          # AWS_REPORT_KEY="${AWS_REPORT_PATH#aws/}"
           
           # Construct the full S3 URI
-          S3_URI="s3://$BUCKET_NAME/$AWS_REPORT_KEY"
+          # S3_URI="s3://$BUCKET_NAME/$AWS_REPORT_KEY"
           
           # Print the constructed S3 URI
-          echo "Latest AWS report URI: $S3_URI"
+          # echo "Latest AWS report URI: $S3_URI"
 
-          echo "Hello"
+          # echo "Hello"
           
-          aws s3 cp $S3_URI reports/ --region ${{ secrets.AWS_REGION }}
-          echo "Production success"
+          # aws s3 cp $S3_URI reports/ --region ${{ secrets.AWS_REGION }}
+          #echo "Production success"
+
+          AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print "s3://'$BUCKET_NAME'/"$4}')
+          
+          echo "Downloading AWS report from: $AWS_REPORT_PATH"
+          aws s3 cp "$AWS_REPORT_PATH" reports/ --region ${{ secrets.AWS_REGION }}
 
       - name: Download GCP reports
         run: |
