@@ -202,6 +202,6 @@ jobs:
             <p>Attached are the latest Scout Suite reports.</p>
             <p><strong>Date:</strong> ${{ env.DATE }}</p>
             <p>Regards,<br>Security Team</p>
-          to: ${{ secrets.EMAIL_TO }}  # e.g., "team@the5ers.com"
-          from: "IAM Operations <iamops@the5ers.com>"  # Must match verified domain!
+          to: "${{ secrets.EMAIL_TO }}"  # e.g., "team@the5ers.com"
+          from: "iamops@the5ers.com"  # Must match verified domain!
           attachments: scout-suite-reports-${{ env.DATE }}.zip
