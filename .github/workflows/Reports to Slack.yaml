@@ -87,7 +87,10 @@ jobs:
       - name: Upload zipped reports to Slack
         uses: slackapi/slack-github-action@v2.0.0
         with:
+          method: files.uploadV2
           token: ${{ secrets.SLACK_BOT_TOKEN }}
-          channels: ${{ secrets.SLACK_CHANNEL_ID }}
-          file: scout-suite-reports-${{ env.DATE }}.zip
-          initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
+          payload: |
+            channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+            initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
+            file: "scout-suite-reports-${{ env.DATE }}.zip"
+            filename: "scout-suite-reports-${{ env.DATE }}.zip"
