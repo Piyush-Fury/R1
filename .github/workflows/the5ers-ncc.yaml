@@ -138,16 +138,16 @@ jobs:
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
 
-      - name: Upload file to Slack
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          method: files.uploadV2
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-            initial_comment: "Scout Suite report for *${{ inputs.environment }}* environment is ready. 📄"
-            file: "ncc-scout-suite-report-${{ env.DATE }}.tar.gz"
-            filename: "ncc-scout-suite-report-${{ env.DATE }}.tar.gz"
+      # - name: Upload file to Slack
+      #   uses: slackapi/slack-github-action@v2.0.0
+      #   with:
+      #     method: files.uploadV2
+      #     token: ${{ secrets.SLACK_BOT_TOKEN }}
+      #     payload: |
+      #       channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+      #       initial_comment: "Scout Suite report for *${{ inputs.environment }}* environment is ready. 📄"
+      #       file: "ncc-scout-suite-report-${{ env.DATE }}.tar.gz"
+      #       filename: "ncc-scout-suite-report-${{ env.DATE }}.tar.gz"
 
  #     - name: Upload Report to Slack
  #       uses: slackapi/slack-github-action@v1.24.0
