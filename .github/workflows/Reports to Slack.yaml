@@ -184,7 +184,7 @@ jobs:
       - name: Send Email via SMTP
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.sendgrid.net  # or your SMTP server
+          server_address: smtp.gmail.com  # or your SMTP server
           server_port: 587                  # 465 for SSL, 587 for TLS
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
