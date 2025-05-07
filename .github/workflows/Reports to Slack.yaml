@@ -210,15 +210,15 @@ jobs:
         env:
           AWS_REGION: us-east-1
         run: |
-          # Generate properly escaped JSON
+          # Generate properly formatted MIME message
           ATTACHMENT_BASE64=$(base64 scout-suite-reports-${{ env.DATE }}.zip | tr -d '\n')
           cat <<EOF > message.json
           {
-            "Data": "From: iamops@the5ers.com\nTo: ${{ secrets.EMAIL_TO }}\nSubject: Scout Suite Reports - ${{ env.DATE }}\nMIME-Version: 1.0\nContent-Type: multipart/mixed; boundary=\"boundary\"\n\n--boundary\nContent-Type: text/html; charset=UTF-8\n\n<p>Reports attached.</p>\n\n--boundary\nContent-Type: application/zip\nContent-Disposition: attachment; filename=\"scout-suite-reports-${{ env.DATE }}.zip\"\nContent-Transfer-Encoding: base64\n\n${ATTACHMENT_BASE64}\n\n--boundary--"
+            "Data": "From: iamops@the5ers.com\nTo: ${{ secrets.EMAIL_TO }}\nSubject: Scout Suite Reports - ${{ env.DATE }}\nMIME-Version: 1.0\nContent-Type: multipart/mixed; boundary=\"MIMEBOUNDARY\"\n\n--MIMEBOUNDARY\nContent-Type: text/html; charset=UTF-8\nContent-Transfer-Encoding: 7bit\n\n<html><body><p>Hello,</p><p>Attached are the latest Scout Suite reports.</p><p><strong>Date:</strong> ${{ env.DATE }}</p></body></html>\n\n--MIMEBOUNDARY\nContent-Type: application/zip\nContent-Disposition: attachment; filename=\"scout-suite-reports-${{ env.DATE }}.zip\"\nContent-Transfer-Encoding: base64\n\n${ATTACHMENT_BASE64}\n\n--MIMEBOUNDARY--"
           }
           EOF
       
-          # Validate JSON syntax first
+          # Validate JSON syntax
           jq empty message.json
       
           # Send email
