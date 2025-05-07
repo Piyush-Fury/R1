@@ -184,18 +184,16 @@ jobs:
       - name: Send Email via SMTP
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com
-          server_port: 465
+          server_address: smtp.sendgrid.net  # or your SMTP server
+          server_port: 587                  # 465 for SSL, 587 for TLS
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: "Scout Suite Reports - ${{ env.DATE }}"
-          body: |
-            Hello,
-            Attached are the latest Scout Suite reports.
-            Date: ${{ env.DATE }}
-            Regards,
-            Security Team
+          html_body: |  # <-- Replaces `content_type: text/html`
+            <p>Hello,</p>
+            <p>Attached are the latest Scout Suite reports.</p>
+            <p><strong>Date:</strong> ${{ env.DATE }}</p>
+            <p>Regards,<br>Security Team</p>
           to: ${{ secrets.EMAIL_TO }}
-          from: GitHub Actions
-          content_type: text/html
+          from: "GitHub Actions"
           attachments: scout-suite-reports-${{ env.DATE }}.zip
