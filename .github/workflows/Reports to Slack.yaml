@@ -181,19 +181,26 @@ jobs:
             file: "scout-suite-reports-${{ env.DATE }}.zip"
             filename: "scout-suite-reports-${{ env.DATE }}.zip"
 
-      - name: Send Email via SMTP
+      - name: Configure AWS Credentials to send mail from root account
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.GH_OIDC_ROLE_ROOT }}
+          aws-region: ${{ secrets.AWS_REGION_ROOT }}
+          role-session-name: ${{ secrets.GH_OIDC_ROLE_SESSION_NAME_ROOT }}
+
+      - name: Send Email via AWS SES
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com  # or your SMTP server
-          server_port: 587                  # 465 for SSL, 587 for TLS
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
+          server_address: email-smtp.us-east-1.amazonaws.com
+          server_port: 587  # TLS (or 465 for SSL)
+          username: ${{ secrets.AWS_SES_SMTP_USERNAME }}  # From SES SMTP Credentials
+          password: ${{ secrets.AWS_SES_SMTP_PASSWORD }}  # From SES SMTP Credentials
           subject: "Scout Suite Reports - ${{ env.DATE }}"
-          html_body: |  # <-- Replaces `content_type: text/html`
+          html_body: |
             <p>Hello,</p>
             <p>Attached are the latest Scout Suite reports.</p>
             <p><strong>Date:</strong> ${{ env.DATE }}</p>
             <p>Regards,<br>Security Team</p>
-          to: ${{ secrets.EMAIL_TO }}
-          from: "GitHub Actions"
+          to: ${{ secrets.EMAIL_TO }}  # e.g., "team@the5ers.com"
+          from: "Security Alerts <security@email.the5ers.com>"  # Must match verified domain!
           attachments: scout-suite-reports-${{ env.DATE }}.zip
