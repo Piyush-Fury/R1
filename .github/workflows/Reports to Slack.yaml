@@ -204,8 +204,8 @@ jobs:
           ses = boto3.client('ses', region_name='${{ secrets.AWS_REGION_ROOT }}')
           
           # Email details
-          sender = "sender@the5ers.com"  # Verified SES email
-          recipient = "recipient@example.com"  # Replace with recipient email
+          sender = "iamops@the5ers.com"  # Verified SES email
+          recipient = "https.piyush@gmail.com"  # Replace with recipient email
           subject = "Scout Suite Report - ${{ env.DATE }}"
           body_text = "Please find attached the Scout Suite report generated on ${{ env.DATE }}."
           body_html = f"""<html>
