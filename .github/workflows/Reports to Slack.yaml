@@ -200,8 +200,8 @@ jobs:
             file: "scout-suite-reports-${{ env.DATE }}.zip"
             filename: "scout-suite-reports-${{ env.DATE }}.zip"
 
-      - name: Send Small Report via SES Attachment
-        run: |
-          aws ses send-raw-email --raw-message file://<(echo '{
-            "Data": "From: no-reply@the5ers.com\nTo: ${{ secrets.RECIPIENT_EMAIL }}\nSubject: Scout Suite Report\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\nReport attached.\n\n--NextPart\nContent-Type: application/zip\nContent-Disposition: attachment; filename=\"report.zip\"\nContent-Transfer-Encoding: base64\n\n$(base64 scout-suite-reports-${{ env.DATE }}.zip)\n--NextPart--"
-          }')
+      # - name: Send Small Report via SES Attachment
+      #   run: |
+      #     aws ses send-raw-email --raw-message file://<(echo '{
+      #       "Data": "From: no-reply@the5ers.com\nTo: ${{ secrets.RECIPIENT_EMAIL }}\nSubject: Scout Suite Report\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\nReport attached.\n\n--NextPart\nContent-Type: application/zip\nContent-Disposition: attachment; filename=\"report.zip\"\nContent-Transfer-Encoding: base64\n\n$(base64 scout-suite-reports-${{ env.DATE }}.zip)\n--NextPart--"
+      #     }')
