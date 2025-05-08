@@ -204,7 +204,7 @@ jobs:
           msg = MIMEMultipart()
           msg['Subject'] = 'Scout Suite Reports'
           msg['From'] = 'iamops@the5ers.com'
-          msg['To'] = piyush.a@iamops.io'
+          msg['To'] = 'piyush.a@iamops.io'
           
           body = MIMEText('Please find attached the Scout Suite reports.')
           msg.attach(body)
