@@ -199,13 +199,6 @@ jobs:
             initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
             file: "scout-suite-reports-${{ env.DATE }}.zip"
             filename: "scout-suite-reports-${{ env.DATE }}.zip"
-      
-      - name: Configure AWS Credentials to send mail from root account
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.GH_OIDC_ROLE_ROOT }}
-          aws-region: ${{ secrets.AWS_REGION_ROOT }}
-          role-session-name: github-actions-session
 
       - name: Send Small Report via SES Attachment
         run: |
