@@ -188,21 +188,80 @@ jobs:
           role-to-assume: ${{ secrets.GH_OIDC_ROLE_ROOT }}
           aws-region: ${{ secrets.AWS_REGION_ROOT }}
           role-session-name: github-actions-session
-          
 
-      # - name: Send Email via AWS SES
-      #   uses: dawidd6/action-send-mail@v3
-      #   with:
-      #     server_address: email-smtp.us-east-1.amazonaws.com
-      #     server_port: 587  # TLS (or 465 for SSL)
-      #     username: ${{ secrets.AWS_SES_SMTP_USERNAME }}  # From SES SMTP Credentials
-      #     password: ${{ secrets.AWS_SES_SMTP_PASSWORD }}  # From SES SMTP Credentials
-      #     subject: "Scout Suite Reports - ${{ env.DATE }}"
-      #     html_body: |
-      #       <p>Hello,</p>
-      #       <p>Attached are the latest Scout Suite reports.</p>
-      #       <p><strong>Date:</strong> ${{ env.DATE }}</p>
-      #       <p>Regards,<br>Security Team</p>
-      #     to: "${{ secrets.EMAIL_TO }}"  # e.g., "team@the5ers.com"
-      #     from: "IAM Operations <iamops@the5ers.com>"  # Must match verified domain!
-      #     attachments: scout-suite-reports-${{ env.DATE }}.zip
+
+      - name: Send email with report via AWS SES
+        run: |
+          # Install required dependencies
+          pip install boto3
+          
+          # Python script to send email with attachment
+          python3 <<EOF
+          import boto3
+          from botocore.exceptions import ClientError
+          
+          # SES client
+          ses = boto3.client('ses', region_name='${{ secrets.AWS_REGION_ROOT }}')
+          
+          # Email details
+          sender = "sender@the5ers.com"  # Verified SES email
+          recipient = "recipient@example.com"  # Replace with recipient email
+          subject = "Scout Suite Report - ${{ env.DATE }}"
+          body_text = "Please find attached the Scout Suite report generated on ${{ env.DATE }}."
+          body_html = f"""<html>
+          <head></head>
+          <body>
+            <h1>Scout Suite Report</h1>
+            <p>Please find attached the Scout Suite report generated on ${{ env.DATE }}.</p>
+          </body>
+          </html>
+          """
+          
+          # Read the zip file
+          with open("scout-suite-reports-${{ env.DATE }}.zip", "rb") as f:
+              file_data = f.read()
+          
+          # Create message
+          message = {
+              'Subject': {'Data': subject},
+              'Body': {
+                  'Text': {'Data': body_text},
+                  'Html': {'Data': body_html}
+              }
+          }
+          
+          # Create attachment
+          attachment = {
+              'Data': file_data,
+              'FileName': "scout-suite-reports-${{ env.DATE }}.zip"
+          }
+          
+          try:
+              response = ses.send_raw_email(
+                  Source=sender,
+                  Destinations=[recipient],
+                  RawMessage={
+                      'Data': (
+                          f"From: {sender}\n"
+                          f"To: {recipient}\n"
+                          f"Subject: {subject}\n"
+                          f"MIME-Version: 1.0\n"
+                          f"Content-Type: multipart/mixed; boundary=\"NextPart\"\n\n"
+                          f"--NextPart\n"
+                          f"Content-Type: text/plain\n\n"
+                          f"{body_text}\n\n"
+                          f"--NextPart\n"
+                          f"Content-Type: text/html\n\n"
+                          f"{body_html}\n\n"
+                          f"--NextPart\n"
+                          f"Content-Type: application/zip; name=\"scout-suite-reports-${{ env.DATE }}.zip\"\n"
+                          f"Content-Disposition: attachment; filename=\"scout-suite-reports-${{ env.DATE }}.zip\"\n"
+                          f"Content-Transfer-Encoding: base64\n\n"
+                      ).encode() + file_data + b"\n--NextPart--"
+                  }
+              )
+              print("Email sent! Message ID:", response['MessageId'])
+          except ClientError as e:
+              print("Error sending email:", e.response['Error']['Message'])
+              raise
+          EOF
