@@ -224,4 +224,4 @@ jobs:
     aws ses send-raw-email --raw-message file://email.txt
   env:
     # Set the recipient email address (could also be a secret)
-    RECIPIENT_EMAIL: "recipient@example.com" # or use ${{ secrets.RECIPIENT_EMAIL }}
+    RECIPIENT_EMAIL: "piyush.a@iamops.io" # or use ${{ secrets.RECIPIENT_EMAIL }}
