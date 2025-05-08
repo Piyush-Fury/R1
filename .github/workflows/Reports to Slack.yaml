@@ -190,37 +190,38 @@ jobs:
           role-session-name: github-actions-session
 
 
-      - name: Send report via email using boto3
-        run: |
-          pip install boto3
-          python -c "
-          import boto3
-          from email.mime.multipart import MIMEMultipart
-          from email.mime.text import MIMEText
-          from email.mime.application import MIMEApplication
-          
-          ses = boto3.client('ses')
-          
-          msg = MIMEMultipart()
-          msg['Subject'] = 'Scout Suite Reports'
-          msg['From'] = 'iamops@the5ers.com'
-          msg['To'] = 'piyush.a@iamops.io'
-          
-          body = MIMEText('Please find attached the Scout Suite reports.')
-          msg.attach(body)
-          
-          with open('scout-suite-reports-${{ env.DATE }}.zip', 'rb') as f:
-              part = MIMEApplication(f.read())
-              part.add_header('Content-Disposition', 'attachment', filename='scout-suite-reports-${{ env.DATE }}.zip')
-              msg.attach(part)
-          
-          ses.send_raw_email(
-              Source=msg['From'],
-              Destinations=[msg['To']],
-              RawMessage={'Data': msg.as_string()}
-          )
-          "
-                except ClientError as e:
-                    print("Error sending email:", e.response['Error']['Message'])
-                    raise
-                EOF
+- name: Upload zipped reports to Slack
+  uses: slackapi/slack-github-action@v2.0.0
+  with:
+    method: files.uploadV2
+    token: ${{ secrets.SLACK_BOT_TOKEN }}
+    payload: |
+      channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+      initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
+      file: "scout-suite-reports-${{ env.DATE }}.zip"
+      filename: "scout-suite-reports-${{ env.DATE }}.zip"
+
+- name: Configure AWS Credentials to send mail from root account
+  uses: aws-actions/configure-aws-credentials@v4
+  with:
+    role-to-assume: ${{ secrets.GH_OIDC_ROLE_ROOT }}
+    aws-region: ${{ secrets.AWS_REGION_ROOT }}
+    role-session-name: github-actions-session
+
+- name: Send report via email using AWS SES
+  run: |
+    # Create a JSON file for the email content
+    echo '{
+      "Data": "From: no-reply@the5ers.com\nTo: piyush.a@iamops.com\nSubject: Scout Suite Reports\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\nPlease find attached the Scout Suite reports.\n\n--NextPart\nContent-Type: application/zip;\nContent-Disposition: attachment; filename=\"scout-suite-reports-${{ env.DATE }}.zip\"\nContent-Transfer-Encoding: base64\n\n' > email.txt
+    
+    # Convert the zip file to base64 and append to email.txt
+    base64 scout-suite-reports-${{ env.DATE }}.zip >> email.txt
+    
+    # Complete the email structure
+    echo '\n--NextPart--' >> email.txt
+    
+    # Send the email using AWS CLI
+    aws ses send-raw-email --raw-message file://email.txt
+  env:
+    # Set the recipient email address (could also be a secret)
+    RECIPIENT_EMAIL: "recipient@example.com" # or use ${{ secrets.RECIPIENT_EMAIL }}
