@@ -11,8 +11,8 @@ on:
     types:
       - completed
   workflow_dispatch:
-  schedule:
-    - cron: '15 0 1 * *'  # Runs at 00:15 UTC on the 1st day of every month
+  # schedule:
+  #   - cron: '15 0 1 * *'  # Runs at 00:15 UTC on the 1st day of every month
 
 jobs:
   send-reports:
