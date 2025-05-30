@@ -155,4 +155,4 @@ jobs:
  #         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
   reports-to-s3:
     needs: [ncc-monthly-scan]
-    uses: ./.github/workflows/the5ers-ncc.yml
+    uses: ./.github/workflows/Reports to Slack.yaml
