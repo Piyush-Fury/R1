@@ -7,10 +7,10 @@ permissions:
 
 on:
   workflow_call:
-  # workflow_run:
-  #   workflows: [NCC Scoute Suite]
-  #   types:
-  #     - completed
+    inputs:
+      env:
+        required: true
+        type: string
   workflow_dispatch:
   # schedule:
   #   - cron: '15 0 1 * *'  # Runs at 00:15 UTC on the 1st day of every month
@@ -18,8 +18,6 @@ on:
 jobs:
   send-reports:
     runs-on: ubuntu-latest
-    environment: Download
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -127,35 +125,7 @@ jobs:
           # Extract GCP report
           tar -xzf reports/gcp/$(basename "$GCP_REPORT_PATH") -C reports/gcp/
           rm reports/gcp/$(basename "$GCP_REPORT_PATH")
-      # - name: Download AWS report
-      #   run: |
-      #     BUCKET_NAME="the5ers-scout-suite-reports"
-      #     PREFIX="aws/the5ers-production/"
-          
-      #     # Get the latest report
-      #     AWS_REPORT_PATH=$(aws s3 ls s3://$BUCKET_NAME/$PREFIX --recursive | sort | tail -n 1 | awk '{print $4}')
-          
-      #     echo "Downloading AWS report: $AWS_REPORT_PATH"
-      #     aws s3 cp "s3://$BUCKET_NAME/$AWS_REPORT_PATH" reports/aws/
 
-      #     # Extract AWS report
-      #     tar -xzf reports/aws/$(basename "$AWS_REPORT_PATH") -C reports/aws/
-      #     rm reports/aws/$(basename "$AWS_REPORT_PATH")
-
-      # - name: Download GCP report
-      #   run: |
-      #     GCP_BUCKET="the5ers-scout-suite-report"
-      #     GCP_PREFIX="gcp/ttp-staging/"
-          
-      #     # Get the latest report
-      #     GCP_REPORT_PATH=$(gsutil ls gs://$GCP_BUCKET/$GCP_PREFIX* | sort | tail -n 1)
-          
-      #     echo "Downloading GCP report: $GCP_REPORT_PATH"
-      #     gsutil cp "$GCP_REPORT_PATH" reports/gcp/
-
-      #     # Extract GCP report
-      #     tar -xzf reports/gcp/$(basename "$GCP_REPORT_PATH") -C reports/gcp/
-      #     rm reports/gcp/$(basename "$GCP_REPORT_PATH")
 
       - name: Verify downloaded content
         run: |
@@ -167,14 +137,6 @@ jobs:
       - name: Create consolidated zip
         run: |
           zip -r scout-suite-reports-${{ env.DATE }}.zip reports/
-
-      # - name: Upload to Slack
-      #   uses: slackapi/slack-github-action@v2.0.0
-      #   with:
-      #     token: ${{ secrets.SLACK_BOT_TOKEN }}
-      #     channels: ${{ secrets.SLACK_CHANNEL_ID }}
-      #     file: scout-suite-reports-${{ env.DATE }}.zip
-      #     initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
           
       - name: Upload zipped reports to Slack
         uses: slackapi/slack-github-action@v2.0.0
