@@ -8,7 +8,7 @@ permissions:
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 1 * *' 
+    - cron: '0 0 1 * *'  # Runs at midnight UTC on the 1st of every month
 
 jobs:
   staging-account:
@@ -26,12 +26,12 @@ jobs:
       environment: the5ers-root
 
   prod-account:
-    name: Run NCare C Scout for Prod Account
+    name: Run NCC Scout for Prod Account
     uses: ./.github/workflows/the5ers-ncc.yaml
     secrets: inherit
     with:
       environment: the5ers-production
-  
+
   ttp-staging-account:
     name: Run NCC Scout for ttp-staging Account
     uses: ./.github/workflows/the5ers-ncc.yaml
@@ -45,3 +45,8 @@ jobs:
     secrets: inherit
     with:
       environment: ttp-prod
+
+  send_reports_to_root_s3:
+    name: Send Consolidated Reports to S3
+    needs: ["staging-account", "root-account", "prod-account", "ttp-staging-account", "ttp-prod-account"]
+    uses: ./.github/workflows/report_to_s3.yaml
