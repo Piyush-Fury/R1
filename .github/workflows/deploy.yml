@@ -13,35 +13,35 @@ on:
 jobs:
   staging-account:
     name: Run NCC Scout for staging Account
-    uses: ./.github/workflows/ncc.yml
+    uses: ./.github/workflows/the5ers-ncc.yaml
     secrets: inherit
     with:
       environment: the5ers-staging
 
   root-account:
     name: Run NCC Scout for root Account
-    uses: ./.github/workflows/ncc.yml
+    uses: ./.github/workflows/the5ers-ncc.yaml
     secrets: inherit
     with:
       environment: the5ers-root
 
   prod-account:
     name: Run NCare C Scout for Prod Account
-    uses: ./.github/workflows/ncc.yml
+    uses: ./.github/workflows/the5ers-ncc.yaml
     secrets: inherit
     with:
       environment: the5ers-production
   
   ttp-staging-account:
     name: Run NCC Scout for ttp-staging Account
-    uses: ./.github/workflows/ncc.yml
+    uses: ./.github/workflows/the5ers-ncc.yaml
     secrets: inherit
     with:
       environment: ttp-staging
 
   ttp-prod-account:
     name: Run NCC Scout for ttp-prod Account
-    uses: ./.github/workflows/ncc.yml
+    uses: ./.github/workflows/the5ers-ncc.yaml
     secrets: inherit
     with:
       environment: ttp-prod
