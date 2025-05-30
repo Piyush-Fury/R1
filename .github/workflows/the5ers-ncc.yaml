@@ -153,6 +153,6 @@ jobs:
  #         upload-files: ${{ steps.archive-report.outputs.archive_file }}
  #       env:
  #         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-  reports-to-s3:
-    needs: [ncc-monthly-scan]
-    uses: ./.github/workflows/report_to_s3.yaml
+  # reports-to-s3:
+  #   needs: [ncc-monthly-scan]
+  #   uses: ./.github/workflows/report_to_s3.yaml
