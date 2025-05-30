@@ -189,19 +189,14 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION_ROOT }}
           role-session-name: github-actions-session
 
-      - name: Upload zipped reports to Slack
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          method: files.uploadV2
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-            initial_comment: "Scout Suite consolidated reports for all environments are ready. 📦"
-            file: "scout-suite-reports-${{ env.DATE }}.zip"
-            filename: "scout-suite-reports-${{ env.DATE }}.zip"
 
-      - name: Send Small Report via SES Attachment
+      - name: Upload report to S3 bucket
+        env:
+          ARCHIVE_FILE: scout-suite-reports-${{ env.DATE }}.zip
+          S3_BUCKET: s3://the5ers-root-scout-suite-reports
         run: |
-          aws ses send-raw-email --raw-message file://<(echo '{
-            "Data": "From: no-reply@the5ers.com\nTo: ${{ secrets.RECIPIENT_EMAIL }}\nSubject: Scout Suite Report\nMIME-Version: 1.0\nContent-type: Multipart/Mixed; boundary=\"NextPart\"\n\n--NextPart\nContent-Type: text/plain\n\nReport attached.\n\n--NextPart\nContent-Type: application/zip\nContent-Disposition: attachment; filename=\"report.zip\"\nContent-Transfer-Encoding: base64\n\n$(base64 scout-suite-reports-${{ env.DATE }}.zip)\n--NextPart--"
-          }')
+          S3_FILE_PATH="${S3_BUCKET}/${ARCHIVE_FILE}"
+      
+          echo "Uploading AWS report to: ${S3_FILE_PATH}"
+          aws s3 cp "${ARCHIVE_FILE}" "${S3_FILE_PATH}"
+
