@@ -203,4 +203,3 @@ jobs:
       
           echo "Uploading AWS report to: ${S3_FILE_PATH}"
           aws s3 cp "${ARCHIVE_FILE}" "${S3_FILE_PATH}"
-
