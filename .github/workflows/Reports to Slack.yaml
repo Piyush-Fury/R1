@@ -7,7 +7,7 @@ permissions:
 
 on:
   workflow_run:
-    workflows: ["NCC Scoute Suite"]
+    workflows: [NCC Scoute Suite]
     types:
       - completed
   workflow_dispatch:
