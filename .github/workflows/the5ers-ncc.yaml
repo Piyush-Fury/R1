@@ -130,6 +130,6 @@ jobs:
             exit 1
           fi
           
-  # reports-to-s3:
-  #   needs: [ncc-monthly-scan]
-  #   uses: ./.github/workflows/report_to_s3.yaml
+  reports-to-s3:
+    needs: [ncc-monthly-scan]
+    uses: ./.github/workflows/report_to_s3.yaml
