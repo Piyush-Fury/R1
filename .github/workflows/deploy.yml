@@ -50,5 +50,3 @@ jobs:
     name: Send Consolidated Reports to S3
     needs: ["staging-account", "root-account", "prod-account", "ttp-staging-account", "ttp-prod-account"]
     uses: ./.github/workflows/report_to_s3.yaml
-    with:
-      environment: Download
